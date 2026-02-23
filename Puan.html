@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GradeGlass Pro - Öğretmen Paneli</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent-yellow: #fbbf24;
+            --deep-purple: #1e1b4b;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at top right, #4c1d95, #1e1b4b, #0f172a);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        .input-glass {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .input-glass:focus {
+            border-color: var(--accent-yellow);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.15);
+            outline: none;
+        }
+
+        .privacy-active {
+            filter: blur(25px) grayscale(0.5);
+            pointer-events: none;
+            user-select: none;
+            opacity: 0.6;
+        }
+
+        .btn-yellow {
+            background: var(--accent-yellow);
+            color: #1e1b4b;
+            transition: all 0.2s ease;
+        }
+
+        .btn-yellow:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(251, 191, 36, 0.3);
+            background: #fcd34d;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--accent-yellow); border-radius: 10px; }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide { animation: slideIn 0.5s ease forwards; }
+    </style>
+</head>
+<body class="antialiased p-4 md:p-10">
+
+    <div class="max-w-7xl mx-auto">
+        <!-- Üst Bilgi Çubuğu -->
+        <header class="flex flex-col md:flex-row justify-between items-center mb-12 gap-6 animate-slide">
+            <div class="flex items-center gap-5">
+                <div class="w-14 h-14 glass rounded-2xl flex items-center justify-center border-yellow-500/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-4xl font-extrabold tracking-tight">Grade<span class="text-yellow-400 font-light italic">Glass</span></h1>
+                    <p class="text-purple-300/70 text-sm tracking-wide">İNGİLİZCE ÖĞRETMENİ ÖZEL PANELİ</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="glass px-6 py-3 rounded-2xl">
+                    <span class="text-[10px] uppercase tracking-[0.2em] text-purple-400 block mb-1">Mevcut Liste</span>
+                    <span id="studentCount" class="text-2xl font-bold text-yellow-400">0</span>
+                    <span class="text-xs text-purple-300 ml-1 italic">Öğrenci</span>
+                </div>
+                <button id="exportExcel" class="btn-yellow px-8 py-4 rounded-2xl font-bold flex items-center gap-3 shadow-xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                    RAPOR AL (CSV)
+                </button>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            <!-- Sol Panel: Giriş -->
+            <div class="lg:col-span-4 space-y-6 animate-slide" style="animation-delay: 0.1s">
+                <div class="glass p-8 rounded-[2rem] relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-yellow-400/5 rounded-full blur-3xl -mr-16 -mt-16"></div>
+                    
+                    <h2 class="text-xl font-bold mb-8 flex items-center gap-3">
+                        <span class="w-8 h-1 bg-yellow-400 rounded-full"></span>
+                        Yeni Puan Girişi
+                    </h2>
+                    
+                    <form id="scoreForm" class="space-y-6">
+                        <div class="space-y-2">
+                            <label class="text-xs font-semibold text-purple-300/80 uppercase tracking-widest ml-1">Öğrenci Ad Soyad</label>
+                            <input type="text" id="nameInput" required 
+                                class="input-glass w-full px-6 py-4 rounded-2xl text-lg placeholder:text-white/20"
+                                placeholder="Burak Yılmaz">
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-xs font-semibold text-purple-300/80 uppercase tracking-widest ml-1">Değerlendirme</label>
+                            <select id="categoryInput" class="input-glass w-full px-6 py-4 rounded-2xl text-white appearance-none cursor-pointer">
+                                <option class="bg-indigo-950" value="Speaking Performance">Speaking Performance</option>
+                                <option class="bg-indigo-950" value="Writing Assignment">Writing Assignment</option>
+                                <option class="bg-indigo-950" value="Listening Test">Listening Test</option>
+                                <option class="bg-indigo-950" value="Class Participation">Class Participation</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-xs font-semibold text-purple-300/80 uppercase tracking-widest ml-1">Puan</label>
+                            <input type="number" id="scoreInput" min="0" max="100" required 
+                                class="input-glass w-full px-6 py-4 rounded-2xl text-3xl font-bold text-center text-yellow-400"
+                                placeholder="--">
+                        </div>
+
+                        <button type="submit" class="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-5 rounded-2xl border border-white/10 transition-all flex items-center justify-center gap-3 group">
+                            KAYDET
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Gizlilik Kontrolü -->
+                <div class="glass p-6 rounded-3xl flex items-center justify-between border-l-4 border-yellow-400">
+                    <div>
+                        <h3 class="font-bold text-yellow-400">Öğrenci Görüşü</h3>
+                        <p class="text-[11px] text-purple-300/60 uppercase tracking-tighter">Listeyi gizlemek için aktifleştirin</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="privacyToggle" class="sr-only peer">
+                        <div class="w-14 h-8 bg-white/5 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-yellow-400"></div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Sağ Panel: Liste -->
+            <div class="lg:col-span-8 animate-slide" style="animation-delay: 0.2s">
+                <div class="glass rounded-[2rem] overflow-hidden flex flex-col h-full border-white/5">
+                    <div class="p-8 border-b border-white/5 flex items-center justify-between bg-white/5">
+                        <h2 class="text-xl font-bold">Öğrenci Not Listesi</h2>
+                        <div id="privacyStatus" class="hidden px-4 py-1.5 bg-yellow-400/10 border border-yellow-400/30 rounded-full text-yellow-400 text-[10px] font-bold tracking-widest animate-pulse">
+                            GİZLİLİK MODU AKTİF
+                        </div>
+                    </div>
+
+                    <div class="flex-grow overflow-auto min-h-[500px] relative">
+                        <table class="w-full text-left">
+                            <thead class="text-[10px] uppercase tracking-[0.2em] text-purple-400/80 sticky top-0 bg-indigo-950/50 backdrop-blur-md z-10">
+                                <tr>
+                                    <th class="px-8 py-5">AD SOYAD</th>
+                                    <th class="px-8 py-5">KATEGORİ</th>
+                                    <th class="px-8 py-5 text-center">SKOR</th>
+                                    <th class="px-8 py-5 text-right">İŞLEM</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scoreTableBody" class="divide-y divide-white/5 transition-all duration-700">
+                                <!-- Dinamik Veri -->
+                            </tbody>
+                        </table>
+
+                        <div id="noData" class="absolute inset-0 flex flex-col items-center justify-center p-20 text-center pointer-events-none">
+                            <div class="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center mb-6 border border-white/10">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-purple-400/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-medium text-white/40">Henüz Kayıt Yok</h3>
+                            <p class="text-sm text-white/20">Eklediğiniz notlar burada listelenecektir.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bildirim -->
+    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 glass px-8 py-4 rounded-2xl border-yellow-400/50 translate-y-32 opacity-0 transition-all duration-500 z-50 flex items-center gap-3">
+        <div class="w-2 h-2 bg-yellow-400 rounded-full animate-ping"></div>
+        <p class="text-sm font-semibold text-yellow-400" id="toastText">İşlem Başarılı</p>
+    </div>
+
+    <script>
+        // Veri Deposu
+        let studentRecords = [];
+        
+        // Element Seçiciler
+        const scoreForm = document.getElementById('scoreForm');
+        const scoreTableBody = document.getElementById('scoreTableBody');
+        const noData = document.getElementById('noData');
+        const studentCount = document.getElementById('studentCount');
+        const privacyToggle = document.getElementById('privacyToggle');
+        const privacyStatus = document.getElementById('privacyStatus');
+        const exportExcel = document.getElementById('exportExcel');
+        const toast = document.getElementById('toast');
+
+        // Kayıt Ekleme
+        scoreForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('nameInput').value;
+            const category = document.getElementById('categoryInput').value;
+            const score = document.getElementById('scoreInput').value;
+
+            const newRecord = {
+                id: Date.now(),
+                name: name,
+                category: category,
+                score: parseInt(score),
+                time: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+            };
+
+            studentRecords.unshift(newRecord); // Yeni kaydı başa ekle
+            updateUI();
+            scoreForm.reset();
+            document.getElementById('nameInput').focus();
+            showToast(`${name} listeye eklendi.`);
+        });
+
+        // UI Güncelleme
+        function updateUI() {
+            if (studentRecords.length > 0) {
+                noData.style.display = 'none';
+                renderTable();
+            } else {
+                noData.style.display = 'flex';
+                scoreTableBody.innerHTML = '';
+            }
+            studentCount.innerText = studentRecords.length;
+        }
+
+        // Tabloyu Oluştur
+        function renderTable() {
+            scoreTableBody.innerHTML = studentRecords.map(item => `
+                <tr class="group hover:bg-white/[0.03] transition-all duration-300">
+                    <td class="px-8 py-6">
+                        <div class="font-bold text-white text-lg">${item.name}</div>
+                        <div class="text-[10px] text-purple-400/50 tracking-widest uppercase mt-1">${item.time} kaydedildi</div>
+                    </td>
+                    <td class="px-8 py-6">
+                        <span class="text-[11px] font-bold px-3 py-1.5 rounded-lg bg-yellow-400/10 text-yellow-400 border border-yellow-400/20">
+                            ${item.category}
+                        </span>
+                    </td>
+                    <td class="px-8 py-6 text-center">
+                        <div class="text-2xl font-black ${item.score >= 50 ? 'text-white' : 'text-rose-500'}">
+                            ${item.score}
+                        </div>
+                    </td>
+                    <td class="px-8 py-6 text-right">
+                        <button onclick="removeRecord(${item.id})" class="opacity-0 group-hover:opacity-100 p-3 text-white/20 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Kayıt Silme
+        window.removeRecord = (id) => {
+            studentRecords = studentRecords.filter(r => r.id !== id);
+            updateUI();
+            showToast("Kayıt silindi.");
+        };
+
+        // Gizlilik Modu Kontrolü
+        privacyToggle.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                scoreTableBody.classList.add('privacy-active');
+                privacyStatus.classList.remove('hidden');
+                showToast("Gizlilik modu aktif.");
+            } else {
+                scoreTableBody.classList.remove('privacy-active');
+                privacyStatus.classList.add('hidden');
+                showToast("Gizlilik modu kapalı.");
+            }
+        });
+
+        // Excel / CSV Aktarımı
+        exportExcel.addEventListener('click', () => {
+            if (studentRecords.length === 0) {
+                showToast("Aktarılacak veri yok!");
+                return;
+            }
+
+            // UTF-8 BOM ekleyerek Excel'in Türkçe karakterleri tanımasını sağlıyoruz
+            let csvContent = "\uFEFF"; 
+            csvContent += "Öğrenci Ad Soyad;Değerlendirme;Puan;Kayıt Saati\n";
+
+            studentRecords.forEach(r => {
+                csvContent += `${r.name};${r.category};${r.score};${r.time}\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            
+            const dateStr = new Date().toLocaleDateString('tr-TR').replace(/\./g, '-');
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Sinif_Degerlendirme_Raporu_${dateStr}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast("Excel raporu indirildi.");
+        });
+
+        // Toast Mesajı Göster
+        function showToast(text) {
+            document.getElementById('toastText').innerText = text;
+            toast.classList.remove('translate-y-32', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-32', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
