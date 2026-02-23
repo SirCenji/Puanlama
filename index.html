@@ -285,7 +285,7 @@
         let historySub = null;
         let currentAvg = "0.0";
         let lastHistory = [];
-        let selectedGender = 'male'; // Default
+        let selectedGender = 'male'; 
         let isLobbyAnon = false;
 
         const getLobbyPath = (code) => `artifacts/${appId}/public/data/lobbies/${code}`;
@@ -294,9 +294,15 @@
 
         async function initAuth() {
             try {
-                await auth.signInAnonymously();
-                currentUser = auth.currentUser;
-            } catch (err) { showToast("Bağlantı Hatası!"); }
+                const cred = await auth.signInAnonymously();
+                currentUser = cred.user;
+                console.log("Auth Hazır:", currentUser.uid);
+                return true;
+            } catch (err) { 
+                console.error("Auth Hatası:", err);
+                showToast("Bağlantı Hatası!"); 
+                return false;
+            }
         }
         initAuth();
 
@@ -307,13 +313,16 @@
         }
 
         async function selectRole(role) {
-            if (!currentUser) { await initAuth(); if (!currentUser) return showToast("Bağlanıyor..."); }
+            if (!currentUser) { 
+                const ok = await initAuth(); 
+                if (!ok) return showToast("Bağlantı bekleniyor..."); 
+            }
             currentRole = role;
             document.getElementById('roleView').classList.add('hidden-view');
             if (role === 'teacher') createLobby();
             else {
                 document.getElementById('studentJoinView').classList.remove('hidden-view');
-                setGender('male'); // Reset UI
+                setGender('male');
             }
         }
 
@@ -330,7 +339,10 @@
                 });
                 setupUI('teacher');
                 startLobbyListeners(code);
-            } catch (e) { showToast("Hata!"); }
+            } catch (e) { 
+                console.error(e);
+                showToast("Hata! Firestore kurallarını kontrol edin."); 
+            }
         }
 
         async function joinLobby() {
@@ -340,24 +352,35 @@
             if (code.length < 4) return showToast("Kod girin!");
             if (name.length < 2) return showToast("Geçerli bir isim girin!");
 
+            if (!currentUser) {
+                await initAuth();
+                if (!currentUser) return showToast("Oturum açılamadı.");
+            }
+
             try {
-                const docRef = await db.doc(getLobbyPath(code)).get();
+                // Güvenli okuma denemesi
+                const lobbyRef = db.doc(getLobbyPath(code));
+                const docRef = await lobbyRef.get();
+                
                 if (!docRef.exists) return showToast("Oda bulunamadı!");
                 
                 currentLobbyCode = code;
-                currentUser.displayName = name; // Local state for identification
-                currentUser.gender = selectedGender;
+                currentUser.customName = name; 
+                currentUser.customGender = selectedGender;
                 
                 setupUI('student');
                 startLobbyListeners(code);
-            } catch (e) { showToast("Erişim hatası."); }
+            } catch (e) { 
+                console.error("Erişim Hatası Detayı:", e);
+                showToast("Erişim Hatası! Firestore ayarlarınızı kontrol edin."); 
+            }
         }
 
         function setupUI(role) {
             document.getElementById('studentJoinView').classList.add('hidden-view');
             document.getElementById('mainDashboard').classList.remove('hidden-view');
             document.getElementById('displayCode').innerText = currentLobbyCode;
-            document.getElementById('roleBadge').innerText = role === 'teacher' ? 'YÖNETİCİ' : currentUser.displayName.toUpperCase();
+            document.getElementById('roleBadge').innerText = role === 'teacher' ? 'YÖNETİCİ' : currentUser.customName.toUpperCase();
             if (role === 'teacher') {
                 document.getElementById('teacherStats').classList.remove('hidden-view');
                 document.getElementById('teacherControls').classList.remove('hidden-view');
@@ -380,7 +403,7 @@
                     activeStudent = data.currentStudent;
                     handleLobbyStateChange();
                 }
-            });
+            }, (err) => console.error("Lobi dinleme hatası:", err));
 
             if (currentRole === 'teacher') {
                 votesSub = getVotesCollection().onSnapshot(snap => {
@@ -388,7 +411,7 @@
                         .map(d => d.data())
                         .filter(v => v.lobbyId === code && v.studentName === activeStudent);
                     updateTeacherStats(activeVotes);
-                });
+                }, (err) => console.error("Oy dinleme hatası:", err));
 
                 historySub = getHistoryCollection().onSnapshot(snap => {
                     const roomHistory = snap.docs
@@ -398,7 +421,7 @@
                     lastHistory = roomHistory;
                     renderHistory(roomHistory);
                     document.getElementById('bulkExportBtn').classList.toggle('hidden', roomHistory.length === 0);
-                });
+                }, (err) => console.error("Geçmiş dinleme hatası:", err));
             }
         }
 
@@ -460,8 +483,8 @@
             try {
                 await getVotesCollection().add({
                     lobbyId: currentLobbyCode,
-                    voterName: currentUser.displayName,
-                    voterGender: currentUser.gender,
+                    voterName: currentUser.customName,
+                    voterGender: currentUser.customGender,
                     studentName: activeStudent,
                     score: score,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
@@ -482,7 +505,7 @@
                 const iconDisplay = isLobbyAnon ? '👤' : genderIcon;
 
                 return `
-                    <div class="bg-white/5 p-3 rounded-xl border border-white/5 flex items-center justify-between animate-in zoom-in">
+                    <div class="glass p-3 rounded-xl border-white/5 flex items-center justify-between animate-in zoom-in">
                         <div class="flex items-center gap-3">
                             <span class="text-lg">${iconDisplay}</span>
                             <span class="text-xs font-bold text-slate-300 truncate max-w-[120px]">${nameDisplay}</span>
@@ -495,10 +518,10 @@
             if (votes.length > 0) {
                 const total = votes.reduce((acc, curr) => acc + curr.score, 0);
                 currentAvg = (total / votes.length).toFixed(1);
-                avgEl.innerText = currentAvg;
+                avgDisplay.innerText = currentAvg;
             } else {
                 currentAvg = "0.0";
-                avgEl.innerText = "0.0";
+                avgDisplay.innerText = "0.0";
             }
         }
 
@@ -559,7 +582,7 @@
             const t = document.getElementById('toast');
             document.getElementById('toastMsg').innerText = msg;
             t.classList.remove('translate-y-32', 'opacity-0');
-            setTimeout(() => t.classList.add('translate-y-32', 'opacity-0'), 3000);
+            setTimeout(() => t.classList.add('translate-y-32', 'opacity-0'), 4000);
         }
     </script>
 </body>
