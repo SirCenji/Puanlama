@@ -113,7 +113,7 @@
                     <div id="avgDisplay" class="text-5xl font-black text-yellow-400 italic leading-none tabular-nums">0.0</div>
                 </div>
                 <div class="flex gap-3">
-                    <button onclick="exportCurrentToSheets()" id="singleExportBtn" class="bg-emerald-500/20 text-emerald-400 p-4 rounded-2xl hover:bg-emerald-500/30 transition-colors border border-emerald-500/20 group" title="Mevcut Veriyi Gönder">
+                    <button onclick="exportAllToSheets()" id="headerExportBtn" class="bg-emerald-500/20 text-emerald-400 p-4 rounded-2xl hover:bg-emerald-500/30 transition-colors border border-emerald-500/20 group" title="Tüm Geçmişi Sheets'e Aktar">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     </button>
                     <button onclick="location.reload()" class="bg-rose-500/20 text-rose-400 p-4 rounded-2xl hover:bg-rose-500/30 transition-colors border border-rose-500/20 group">
@@ -143,7 +143,7 @@
 
                 <div class="glass p-6 rounded-[2rem] border-l-4 border-emerald-400 bg-emerald-400/5">
                     <h4 class="font-bold text-emerald-400 text-sm mb-2 uppercase tracking-tighter italic">Bulut Durumu</h4>
-                    <p class="text-[11px] text-slate-400 leading-relaxed italic">Bağlantı kuruldu. Oylama bittiğinde yeşil butona tıklayarak veriyi doğrudan Sheets'e aktarabilirsiniz.</p>
+                    <p class="text-[11px] text-slate-400 leading-relaxed italic">Bağlantı kuruldu. Oylamalar bittikten sonra üstteki yeşil butona basarak tüm sınıf listesini Sheets'e gönderebilirsiniz.</p>
                 </div>
             </div>
 
@@ -219,7 +219,6 @@
             measurementId: "G-T4N14WHMT3"
         };
 
-        // Güncellenmiş Google Apps Script URL'si
         const AUTO_SHEETS_URL = "https://script.google.com/macros/s/AKfycbwQiJWSFC45CIXjxzOVufPc4FEv4T1oFOdyea1qTUd2npgDnFq9ZNUXFhSNzlt4f3Y/exec";
         const appId = "gradelobby-system-vfinal"; 
         
@@ -347,6 +346,7 @@
             if (!newName) return showToast("Lütfen isim girin.");
 
             try {
+                // Mevcut öğrenciyi geçmişe kaydet
                 if (activeStudent && currentAvg !== "0.0") {
                     await getHistoryCollection().add({
                         lobbyId: currentLobbyCode,
@@ -401,7 +401,7 @@
         function renderHistory(historyData) {
             const container = document.getElementById('historyList');
             if (historyData.length === 0) {
-                container.innerHTML = `<div class="text-center opacity-20 py-20 italic">Geçmiş boş.</div>`;
+                container.innerHTML = `<div class="text-center opacity-20 py-20 italic text-white">Henüz veri yok.</div>`;
                 return;
             }
             container.innerHTML = historyData.map(h => `
@@ -426,45 +426,28 @@
             `).join('');
         }
 
-        // GOOGLE SHEETS AKTARIMI (GELİŞTİRİLMİŞ)
-        async function exportCurrentToSheets() {
-            const avg = document.getElementById('avgDisplay').innerText;
-            if (avg === "0.0") return showToast("Önce oyları bekleyin.");
-
-            const btn = document.getElementById('singleExportBtn');
-            btn.disabled = true;
-            showToast("İletiliyor...");
-
-            const payload = { 
-                name: activeStudent, 
-                score: avg, 
-                time: new Date().toLocaleString('tr-TR') 
-            };
-
-            try {
-                await fetch(AUTO_SHEETS_URL, { 
-                    method: 'POST', 
-                    mode: 'no-cors',
-                    cache: 'no-cache',
-                    headers: { 'Content-Type': 'text/plain' },
-                    body: JSON.stringify(payload) 
-                });
-                showToast("Veri başarıyla aktarıldı!");
-            } catch (e) { 
-                console.error("Sheets hatası:", e);
-                showToast("Aktarım hatası!"); 
-            }
-            finally { btn.disabled = false; }
-        }
-
+        // GOOGLE SHEETS AKTARIMI (TÜM LİSTEYİ GÖNDERİR)
         async function exportAllToSheets() {
-            if (lastHistory.length === 0) return;
+            // Geçmiş listesi ve (eğer varsa) mevcut öğrenciyi birleştiriyoruz
+            let exportData = [...lastHistory];
+            
+            // Eğer şu an tahtada biri varsa ve oyları geldiyse onu da listeye ekliyoruz
+            if (activeStudent && currentAvg !== "0.0") {
+                exportData.push({
+                    studentName: activeStudent,
+                    score: currentAvg,
+                    timestamp: Date.now()
+                });
+            }
 
-            const btn = document.getElementById('bulkExportBtn');
-            btn.innerText = "Bekleyin...";
+            if (exportData.length === 0) return showToast("Aktarılacak veri bulunamadı.");
+
+            const btn = document.getElementById('headerExportBtn');
             btn.disabled = true;
+            showToast("Tüm liste Sheets'e iletiliyor...");
 
-            const payload = lastHistory.map(h => ({
+            // Verileri toplu formatta hazırlıyoruz
+            const payload = exportData.map(h => ({
                 name: h.studentName,
                 score: h.score,
                 time: new Date(h.timestamp).toLocaleString('tr-TR')
@@ -474,17 +457,16 @@
                 await fetch(AUTO_SHEETS_URL, { 
                     method: 'POST', 
                     mode: 'no-cors',
+                    cache: 'no-cache',
                     headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify(payload) 
                 });
-                showToast("Tüm liste başarıyla iletildi!");
+                showToast(`Başarılı! ${payload.length} kayıt aktarıldı.`);
             } catch (e) { 
-                showToast("Hata oluştu!"); 
+                console.error("Sheets hatası:", e);
+                showToast("Aktarım hatası!"); 
             }
-            finally { 
-                btn.innerText = "Tümünü Aktar";
-                btn.disabled = false; 
-            }
+            finally { btn.disabled = false; }
         }
 
         function showToast(msg) {
