@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GradeLobby Pro - Google Sheets Entegre</title>
+    <title>GradeLobby Pro - Canlı Puanlama</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
@@ -57,7 +57,7 @@
             <h1 class="text-6xl font-black italic tracking-tighter uppercase leading-none mb-2 text-white">
                 GRADE<span class="text-yellow-400">LOBBY</span>
             </h1>
-            <p class="text-purple-300/60 font-semibold tracking-[0.3em] text-xs uppercase text-white">Bulut Tabanlı Değerlendirme</p>
+            <p class="text-purple-300/60 font-semibold tracking-[0.3em] text-xs uppercase text-white">Canlı Değerlendirme Sistemi</p>
         </div>
 
         <div class="grid grid-cols-1 gap-4 text-white">
@@ -85,10 +85,10 @@
 
     <!-- Öğrenci Giriş Ekranı -->
     <div id="studentJoinView" class="max-w-md mx-auto mt-20 hidden-view animate-in slide-in-from-bottom-10 duration-500">
-        <div class="glass p-10 rounded-[3rem] space-y-8 relative overflow-hidden">
-            <h2 class="text-3xl font-black text-center italic tracking-tight text-white uppercase">Odaya Katıl</h2>
+        <div class="glass p-10 rounded-[3rem] space-y-8 relative overflow-hidden text-white">
+            <h2 class="text-3xl font-black text-center italic tracking-tight uppercase">Odaya Katıl</h2>
             <div class="space-y-4">
-                <input type="text" id="lobbyCodeInput" placeholder="ODA KODU" class="input-glass w-full px-8 py-5 rounded-2xl text-center text-3xl font-black tracking-[0.3em] uppercase text-white">
+                <input type="text" id="lobbyCodeInput" placeholder="ODA KODU" class="input-glass w-full px-8 py-5 rounded-2xl text-center text-3xl font-black tracking-[0.3em] uppercase">
                 <button onclick="joinLobby()" class="w-full bg-yellow-400 text-indigo-950 font-black py-5 rounded-2xl shadow-2xl hover:bg-yellow-300 transition-all text-lg tracking-widest uppercase">GİRİŞ YAP</button>
                 <button onclick="location.reload()" class="w-full text-slate-500 text-xs font-bold uppercase tracking-widest opacity-50 hover:opacity-100 transition-opacity">Geri Dön</button>
             </div>
@@ -102,14 +102,14 @@
             <div class="flex items-center gap-5">
                 <div id="displayCode" class="w-16 h-16 bg-yellow-400 text-indigo-900 rounded-2xl flex items-center justify-center font-black text-2xl shadow-[0_10px_30px_rgba(251,191,36,0.2)]">...</div>
                 <div>
-                    <h3 class="font-bold text-xl tracking-tight text-white" id="statusHeader">Oturum Yayında</h3>
+                    <h3 class="font-bold text-xl tracking-tight text-white" id="statusHeader">Canlı Oturum</h3>
                     <p id="roleBadge" class="text-[10px] font-black uppercase tracking-[0.2em] text-yellow-400/80">YÖNETİCİ</p>
                 </div>
             </div>
 
             <div id="teacherStats" class="flex items-center gap-10 hidden-view">
                 <div class="text-center">
-                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Anlık Ortalama</p>
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Mevcut Ortalama</p>
                     <div id="avgDisplay" class="text-5xl font-black text-yellow-400 italic leading-none tabular-nums">0.0</div>
                 </div>
                 <div class="flex gap-3">
@@ -129,21 +129,36 @@
                 <div class="glass p-8 rounded-[2.5rem] space-y-6 relative overflow-hidden">
                     <h3 class="text-xl font-bold flex items-center gap-3 italic text-white">
                         <span class="w-2 h-6 bg-yellow-400 rounded-full"></span>
-                        Sınıf Paneli
+                        Kontrol
                     </h3>
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Tahtadaki Öğrenci</label>
-                        <input type="text" id="presentingStudentInput" placeholder="Örn: Burak Yılmaz" class="input-glass w-full px-6 py-4 rounded-2xl font-bold text-lg text-white">
+                    
+                    <!-- Yeni Öğrenci Başlatma -->
+                    <div id="startSection" class="space-y-4">
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Sıradaki Öğrenci</label>
+                            <input type="text" id="presentingStudentInput" placeholder="Örn: Burak Yılmaz" class="input-glass w-full px-6 py-4 rounded-2xl font-bold text-lg text-white">
+                        </div>
+                        <button onclick="updateLobbyStudent()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-5 rounded-2xl shadow-xl transition-all tracking-widest text-sm uppercase group">
+                            SUNUMU BAŞLAT 
+                            <svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                        </button>
                     </div>
-                    <button onclick="updateLobbyStudent()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-5 rounded-2xl shadow-xl transition-all tracking-widest text-sm uppercase group">
-                        TAHTAYA ÇIKAR 
-                        <svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-                    </button>
+
+                    <!-- Aktif Puanlamayı Bitirme -->
+                    <div id="finishSection" class="hidden-view space-y-4 pt-4 border-t border-white/5 animate-in slide-in-from-top-2">
+                        <div class="p-4 bg-yellow-400/10 rounded-2xl border border-yellow-400/20 text-center">
+                            <p class="text-[10px] font-bold text-yellow-400 uppercase">Şu An Tahtada</p>
+                            <p id="finishStudentName" class="text-lg font-black text-white italic uppercase"></p>
+                        </div>
+                        <button onclick="finishScoring()" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-5 rounded-2xl shadow-xl transition-all tracking-widest text-sm uppercase group">
+                            PUANLAMAYI BİTİR
+                        </button>
+                    </div>
                 </div>
 
                 <div class="glass p-6 rounded-[2rem] border-l-4 border-emerald-400 bg-emerald-400/5">
-                    <h4 class="font-bold text-emerald-400 text-sm mb-2 uppercase tracking-tighter italic">Bulut Durumu</h4>
-                    <p class="text-[11px] text-slate-400 leading-relaxed italic">Bağlantı kuruldu. Oylamalar bittikten sonra üstteki yeşil butona basarak tüm sınıf listesini Sheets'e gönderebilirsiniz.</p>
+                    <h4 class="font-bold text-emerald-400 text-sm mb-2 uppercase tracking-tighter italic text-white">Canlı Değişim</h4>
+                    <p class="text-[11px] text-slate-400 leading-relaxed italic">Öğrenciler puan verdikçe ortalama yukarıda anlık olarak güncellenir. "Bitir" dediğinizde sonuç kalıcı listeye aktarılır.</p>
                 </div>
             </div>
 
@@ -155,7 +170,7 @@
                     <div class="glass rounded-[3rem] overflow-hidden flex flex-col min-h-[500px] border-yellow-400/10">
                         <div class="p-8 border-b border-white/5 flex justify-between items-center bg-white/5">
                             <h3 class="font-bold text-lg italic text-white uppercase tracking-tighter">Gelen Oylar (<span id="voteCount" class="text-yellow-400">0</span>)</h3>
-                            <p id="activeStudentLabel" class="text-yellow-400 font-black uppercase italic tracking-wider text-white"></p>
+                            <p id="activeStudentLabel" class="text-yellow-400 font-black uppercase italic tracking-wider"></p>
                         </div>
                         <div id="votesGrid" class="p-8 grid grid-cols-2 gap-4 overflow-auto custom-scrollbar">
                             <!-- Oylar Buraya -->
@@ -178,11 +193,11 @@
                     </div>
                 </div>
 
-                <!-- Öğrenci Oylama Ekranı -->
+                <!-- Öğrenci Puanlama Ekranı -->
                 <div id="studentVoteView" class="w-full max-w-2xl mx-auto hidden-view space-y-12 py-10">
                     <div class="text-center space-y-4">
                         <p class="text-xs font-bold text-indigo-400 uppercase tracking-[0.4em]">Değerlendirme Başladı</p>
-                        <h2 id="currentStudentDisplay" class="text-6xl font-black italic uppercase tracking-tighter text-white drop-shadow-2xl text-white">...</h2>
+                        <h2 id="currentStudentDisplay" class="text-6xl font-black italic uppercase tracking-tighter text-white drop-shadow-2xl">...</h2>
                     </div>
 
                     <div id="voteButtons" class="glass p-12 rounded-[3.5rem] shadow-2xl relative overflow-hidden">
@@ -333,6 +348,17 @@
         function handleLobbyStateChange() {
             if (currentRole === 'teacher') {
                 document.getElementById('activeStudentLabel').innerText = activeStudent;
+                const finishSec = document.getElementById('finishSection');
+                const startSec = document.getElementById('startSection');
+                
+                if (activeStudent) {
+                    document.getElementById('finishStudentName').innerText = activeStudent;
+                    finishSec.classList.remove('hidden-view');
+                    startSec.classList.add('hidden-view');
+                } else {
+                    finishSec.classList.add('hidden-view');
+                    startSec.classList.remove('hidden-view');
+                }
             } else {
                 document.getElementById('currentStudentDisplay').innerText = activeStudent || "BEKLENİYOR...";
                 document.getElementById('voteButtons').classList.remove('hidden-view');
@@ -340,27 +366,44 @@
             }
         }
 
+        // Sunumu Başlat
         async function updateLobbyStudent() {
             const input = document.getElementById('presentingStudentInput');
             const newName = input.value.trim();
             if (!newName) return showToast("Lütfen isim girin.");
 
             try {
-                // Mevcut öğrenciyi geçmişe kaydet
-                if (activeStudent && currentAvg !== "0.0") {
-                    await getHistoryCollection().add({
-                        lobbyId: currentLobbyCode,
-                        studentName: activeStudent,
-                        score: currentAvg,
-                        timestamp: Date.now()
-                    });
-                }
                 await db.doc(getLobbyPath(currentLobbyCode)).update({
                     currentStudent: newName
                 });
                 input.value = '';
-                showToast("Yeni sunum başladı!");
+                showToast("Sunum başlatıldı! Puanlar bekleniyor...");
             } catch (e) { showToast("Sunum güncellenemedi."); }
+        }
+
+        // Puanlamayı Bitir ve Kaydet
+        async function finishScoring() {
+            if (!activeStudent) return;
+            
+            try {
+                // 1. Mevcut ortalamayı geçmiş listesine (History) kaydet
+                await getHistoryCollection().add({
+                    lobbyId: currentLobbyCode,
+                    studentName: activeStudent,
+                    score: currentAvg,
+                    timestamp: Date.now()
+                });
+
+                // 2. Lobi durumunu boşalt (Herkesi bekleme moduna sokar)
+                await db.doc(getLobbyPath(currentLobbyCode)).update({
+                    currentStudent: ""
+                });
+
+                showToast(`${activeStudent} puanlaması kaydedildi.`);
+            } catch (e) {
+                console.error(e);
+                showToast("Kaydetme hatası!");
+            }
         }
 
         async function submitVote(score) {
@@ -410,7 +453,7 @@
                         <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest">BİTTİ</span>
                         <span class="text-lg font-bold tracking-tight text-white uppercase italic">${h.studentName}</span>
                     </div>
-                    <div class="bg-yellow-400 text-indigo-950 px-4 py-2 rounded-xl font-black italic text-xl">
+                    <div class="bg-yellow-400 text-indigo-950 px-4 py-2 rounded-xl font-black italic text-xl shadow-lg">
                         ${h.score}
                     </div>
                 </div>
@@ -426,12 +469,9 @@
             `).join('');
         }
 
-        // GOOGLE SHEETS AKTARIMI (TÜM LİSTEYİ GÖNDERİR)
         async function exportAllToSheets() {
-            // Geçmiş listesi ve (eğer varsa) mevcut öğrenciyi birleştiriyoruz
             let exportData = [...lastHistory];
             
-            // Eğer şu an tahtada biri varsa ve oyları geldiyse onu da listeye ekliyoruz
             if (activeStudent && currentAvg !== "0.0") {
                 exportData.push({
                     studentName: activeStudent,
@@ -446,7 +486,6 @@
             btn.disabled = true;
             showToast("Tüm liste Sheets'e iletiliyor...");
 
-            // Verileri toplu formatta hazırlıyoruz
             const payload = exportData.map(h => ({
                 name: h.studentName,
                 score: h.score,
