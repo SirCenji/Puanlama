@@ -2,8 +2,8 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GradeLobby Pro - Canlı Puanlama</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GradeLobby Pro - Gelişmiş Puanlama</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
@@ -19,10 +19,13 @@
             background-attachment: fixed;
             min-height: 100vh;
             color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
         }
         .glass {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
         }
@@ -39,177 +42,209 @@
             box-shadow: 0 0 20px rgba(251, 191, 36, 0.2); 
         }
         .hidden-view { display: none !important; }
-        .vote-btn { transition: all 0.2s ease; }
-        .vote-btn:hover { transform: translateY(-4px); background: #fbbf24; color: #1e1b4b; }
-        .vote-btn:active { transform: scale(0.9); }
+        .vote-btn { 
+            transition: all 0.2s ease; 
+            touch-action: manipulation;
+        }
+        .vote-btn:active { transform: scale(0.92); background: #fbbf24; color: #1e1b4b; }
         
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
+        .gender-btn { border: 2px solid transparent; opacity: 0.6; transition: 0.3s; }
+        .gender-btn.active { border-color: #fbbf24; opacity: 1; transform: scale(1.05); }
+
+        /* Toggle Switch Styling */
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.1); transition: .4s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #fbbf24; }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: #fbbf24; border-radius: 10px; }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
     <!-- Rol Seçim Ekranı -->
-    <div id="roleView" class="max-w-md mx-auto mt-20 space-y-8 animate-in fade-in duration-700">
+    <div id="roleView" class="max-w-md mx-auto mt-10 md:mt-20 space-y-8 animate-in fade-in duration-700 px-2 text-white">
         <div class="text-center">
-            <h1 class="text-6xl font-black italic tracking-tighter uppercase leading-none mb-2 text-white">
+            <h1 class="text-5xl md:text-6xl font-black italic tracking-tighter uppercase leading-none mb-2">
                 GRADE<span class="text-yellow-400">LOBBY</span>
             </h1>
-            <p class="text-purple-300/60 font-semibold tracking-[0.3em] text-xs uppercase text-white">Canlı Değerlendirme Sistemi</p>
+            <p class="text-purple-300/60 font-semibold tracking-[0.2em] text-[10px] uppercase">Yeni Nesil Değerlendirme</p>
         </div>
 
-        <div class="grid grid-cols-1 gap-4 text-white">
-            <button onclick="selectRole('teacher')" class="glass p-10 rounded-[2.5rem] hover:bg-white/5 transition-all group flex flex-col items-center gap-4">
-                <div class="bg-yellow-400 p-5 rounded-3xl text-indigo-950 group-hover:rotate-12 transition-transform shadow-xl shadow-yellow-400/20">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <div class="grid grid-cols-1 gap-4">
+            <button onclick="selectRole('teacher')" class="glass p-8 md:p-10 rounded-[2rem] hover:bg-white/5 transition-all group flex flex-col items-center gap-4 active:scale-95">
+                <div class="bg-yellow-400 p-4 md:p-5 rounded-2xl text-indigo-950 shadow-xl shadow-yellow-400/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                 </div>
                 <div class="text-center">
-                    <span class="text-2xl font-black tracking-tight block text-white">Öğretmen Girişi</span>
-                    <span class="text-[10px] text-slate-500 uppercase tracking-widest text-white">Odayı Kur ve Yönet</span>
+                    <span class="text-xl md:text-2xl font-black tracking-tight block uppercase">Öğretmen</span>
+                    <span class="text-[9px] text-slate-500 uppercase tracking-widest text-white opacity-60">Kontrol Paneli</span>
                 </div>
             </button>
 
-            <button onclick="selectRole('student')" class="glass p-10 rounded-[2.5rem] hover:bg-white/5 transition-all group flex flex-col items-center gap-4">
-                <div class="bg-indigo-500 p-5 rounded-3xl text-white group-hover:-rotate-12 transition-transform shadow-xl shadow-indigo-500/20">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20a6 6 0 0 0-12 0"/><circle cx="12" cy="10" r="4"/><circle cx="12" cy="12" r="10"/></svg>
+            <button onclick="selectRole('student')" class="glass p-8 md:p-10 rounded-[2rem] hover:bg-white/5 transition-all group flex flex-col items-center gap-4 active:scale-95">
+                <div class="bg-indigo-500 p-4 md:p-5 rounded-2xl text-white shadow-xl shadow-indigo-500/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20a6 6 0 0 0-12 0"/><circle cx="12" cy="10" r="4"/><circle cx="12" cy="12" r="10"/></svg>
                 </div>
                 <div class="text-center">
-                    <span class="text-2xl font-black tracking-tight block text-white">Öğrenci Girişi</span>
-                    <span class="text-[10px] text-slate-500 uppercase tracking-widest text-white">Kodla Giriş Yap</span>
+                    <span class="text-xl md:text-2xl font-black tracking-tight block uppercase">Öğrenci</span>
+                    <span class="text-[9px] text-slate-500 uppercase tracking-widest text-white opacity-60">Puanlama Ekranı</span>
                 </div>
             </button>
         </div>
     </div>
 
-    <!-- Öğrenci Giriş Ekranı -->
-    <div id="studentJoinView" class="max-w-md mx-auto mt-20 hidden-view animate-in slide-in-from-bottom-10 duration-500">
-        <div class="glass p-10 rounded-[3rem] space-y-8 relative overflow-hidden text-white">
-            <h2 class="text-3xl font-black text-center italic tracking-tight uppercase">Odaya Katıl</h2>
+    <!-- Öğrenci Giriş ve Detay Ekranı -->
+    <div id="studentJoinView" class="max-w-md mx-auto mt-10 md:mt-20 hidden-view animate-in slide-in-from-bottom-10 duration-500 px-2 text-white">
+        <div class="glass p-8 md:p-10 rounded-[2.5rem] space-y-6 relative overflow-hidden">
+            <h2 class="text-2xl font-black text-center italic tracking-tight uppercase">Lobiye Katıl</h2>
+            
             <div class="space-y-4">
-                <input type="text" id="lobbyCodeInput" placeholder="ODA KODU" class="input-glass w-full px-8 py-5 rounded-2xl text-center text-3xl font-black tracking-[0.3em] uppercase">
-                <button onclick="joinLobby()" class="w-full bg-yellow-400 text-indigo-950 font-black py-5 rounded-2xl shadow-2xl hover:bg-yellow-300 transition-all text-lg tracking-widest uppercase">GİRİŞ YAP</button>
-                <button onclick="location.reload()" class="w-full text-slate-500 text-xs font-bold uppercase tracking-widest opacity-50 hover:opacity-100 transition-opacity">Geri Dön</button>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-1 block">Oda Kodu</label>
+                    <input type="text" id="lobbyCodeInput" placeholder="ODA KODU" class="input-glass w-full px-5 py-3.5 rounded-xl text-center text-xl font-black tracking-[0.2em] uppercase">
+                </div>
+                
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-1 block">Adınız Soyadınız</label>
+                    <input type="text" id="studentNameInput" placeholder="İsim Girin" class="input-glass w-full px-5 py-3.5 rounded-xl font-bold text-base">
+                </div>
+
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-2 block text-center">Cinsiyet Seçimi</label>
+                    <div class="flex gap-4">
+                        <button onclick="setGender('male')" id="maleBtn" class="gender-btn flex-1 bg-blue-500/20 py-3 rounded-xl flex flex-col items-center gap-1">
+                            <span class="text-2xl">♂</span>
+                            <span class="text-[10px] font-bold uppercase">Erkek</span>
+                        </button>
+                        <button onclick="setGender('female')" id="femaleBtn" class="gender-btn flex-1 bg-pink-500/20 py-3 rounded-xl flex flex-col items-center gap-1">
+                            <span class="text-2xl">♀</span>
+                            <span class="text-[10px] font-bold uppercase">Kadın</span>
+                        </button>
+                    </div>
+                </div>
+
+                <button onclick="joinLobby()" class="w-full bg-yellow-400 text-indigo-950 font-black py-4 rounded-xl shadow-2xl active:scale-95 transition-all text-base tracking-widest uppercase">GİRİŞ YAP</button>
+                <button onclick="location.reload()" class="w-full text-slate-500 text-xs font-bold uppercase tracking-widest opacity-60">Geri Dön</button>
             </div>
         </div>
     </div>
 
-    <!-- Dashboard -->
-    <div id="mainDashboard" class="max-w-[1400px] mx-auto hidden-view space-y-8 animate-in fade-in duration-1000">
+    <!-- Ana Dashboard -->
+    <div id="mainDashboard" class="max-w-[1400px] mx-auto hidden-view space-y-6 md:space-y-8 animate-in fade-in duration-1000">
         <!-- Header -->
-        <header class="glass p-6 rounded-[2rem] flex flex-col md:flex-row justify-between items-center gap-6">
-            <div class="flex items-center gap-5">
-                <div id="displayCode" class="w-16 h-16 bg-yellow-400 text-indigo-900 rounded-2xl flex items-center justify-center font-black text-2xl shadow-[0_10px_30px_rgba(251,191,36,0.2)]">...</div>
+        <header class="glass p-4 md:p-6 rounded-[1.5rem] md:rounded-[2rem] flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4 md:gap-5 w-full md:w-auto">
+                <div id="displayCode" class="w-12 h-12 md:w-16 md:h-16 bg-yellow-400 text-indigo-900 rounded-xl md:rounded-2xl flex items-center justify-center font-black text-lg md:text-2xl shadow-lg">...</div>
                 <div>
-                    <h3 class="font-bold text-xl tracking-tight text-white" id="statusHeader">Canlı Oturum</h3>
-                    <p id="roleBadge" class="text-[10px] font-black uppercase tracking-[0.2em] text-yellow-400/80">YÖNETİCİ</p>
+                    <h3 class="font-bold text-base md:text-xl tracking-tight text-white" id="statusHeader">Oturum Açık</h3>
+                    <p id="roleBadge" class="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-yellow-400/80">YÜKLENİYOR</p>
                 </div>
             </div>
 
-            <div id="teacherStats" class="flex items-center gap-10 hidden-view">
+            <div id="teacherStats" class="flex items-center justify-between md:justify-end gap-6 md:gap-10 hidden-view w-full md:w-auto border-t md:border-none border-white/5 pt-4 md:pt-0">
                 <div class="text-center">
-                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Mevcut Ortalama</p>
-                    <div id="avgDisplay" class="text-5xl font-black text-yellow-400 italic leading-none tabular-nums">0.0</div>
+                    <p class="text-[8px] md:text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-0.5 md:mb-1 text-white">Anlık Ortalama</p>
+                    <div id="avgDisplay" class="text-3xl md:text-5xl font-black text-yellow-400 italic leading-none tabular-nums">0.0</div>
                 </div>
-                <div class="flex gap-3">
-                    <button onclick="exportAllToSheets()" id="headerExportBtn" class="bg-emerald-500/20 text-emerald-400 p-4 rounded-2xl hover:bg-emerald-500/30 transition-colors border border-emerald-500/20 group" title="Tüm Geçmişi Sheets'e Aktar">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <div class="flex gap-2">
+                    <button onclick="exportAllToSheets()" class="bg-emerald-500/20 text-emerald-400 p-3 md:p-4 rounded-xl md:rounded-2xl hover:bg-emerald-500/30 transition-colors border border-emerald-500/20" title="Tabloya Aktar">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 md:w-6 md:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     </button>
-                    <button onclick="location.reload()" class="bg-rose-500/20 text-rose-400 p-4 rounded-2xl hover:bg-rose-500/30 transition-colors border border-rose-500/20 group">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    <button onclick="location.reload()" class="bg-rose-500/20 text-rose-400 p-3 md:p-4 rounded-xl md:rounded-2xl border border-rose-500/20">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 md:w-6 md:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                     </button>
                 </div>
             </div>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <!-- Öğretmen Kontrolleri -->
-            <div id="teacherControls" class="lg:col-span-3 space-y-6 hidden-view">
-                <div class="glass p-8 rounded-[2.5rem] space-y-6 relative overflow-hidden">
-                    <h3 class="text-xl font-bold flex items-center gap-3 italic text-white">
-                        <span class="w-2 h-6 bg-yellow-400 rounded-full"></span>
-                        Kontrol
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
+            <!-- Öğretmen Paneli -->
+            <div id="teacherControls" class="lg:col-span-3 space-y-4 md:space-y-6 hidden-view">
+                <div class="glass p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] space-y-6 relative overflow-hidden text-white">
+                    <h3 class="text-lg md:text-xl font-bold flex items-center gap-3 italic">
+                        <span class="w-1.5 h-5 md:w-2 md:h-6 bg-yellow-400 rounded-full"></span>
+                        Oturum Yönetimi
                     </h3>
                     
-                    <!-- Yeni Öğrenci Başlatma -->
                     <div id="startSection" class="space-y-4">
                         <div class="space-y-2">
-                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Sıradaki Öğrenci</label>
-                            <input type="text" id="presentingStudentInput" placeholder="Örn: Burak Yılmaz" class="input-glass w-full px-6 py-4 rounded-2xl font-bold text-lg text-white">
+                            <label class="text-[9px] font-bold text-slate-500 uppercase tracking-widest ml-1">Öğrenci Adı</label>
+                            <input type="text" id="presentingStudentInput" placeholder="Örn: Burak" class="input-glass w-full px-5 py-3.5 md:py-4 rounded-xl md:rounded-2xl font-bold text-base md:text-lg text-white">
                         </div>
-                        <button onclick="updateLobbyStudent()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-5 rounded-2xl shadow-xl transition-all tracking-widest text-sm uppercase group">
+                        <button onclick="updateLobbyStudent()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 md:py-5 rounded-xl md:rounded-2xl shadow-xl transition-all tracking-widest text-xs md:text-sm uppercase">
                             SUNUMU BAŞLAT 
-                            <svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                         </button>
                     </div>
 
-                    <!-- Aktif Puanlamayı Bitirme -->
                     <div id="finishSection" class="hidden-view space-y-4 pt-4 border-t border-white/5 animate-in slide-in-from-top-2">
-                        <div class="p-4 bg-yellow-400/10 rounded-2xl border border-yellow-400/20 text-center">
-                            <p class="text-[10px] font-bold text-yellow-400 uppercase">Şu An Tahtada</p>
-                            <p id="finishStudentName" class="text-lg font-black text-white italic uppercase"></p>
+                        <div class="p-3 md:p-4 bg-yellow-400/10 rounded-xl md:rounded-2xl border border-yellow-400/20 text-center">
+                            <p class="text-[8px] md:text-[10px] font-bold text-yellow-400 uppercase">Aktif Sunum</p>
+                            <p id="finishStudentName" class="text-base md:text-lg font-black text-white italic uppercase truncate"></p>
                         </div>
-                        <button onclick="finishScoring()" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-5 rounded-2xl shadow-xl transition-all tracking-widest text-sm uppercase group">
+                        <button onclick="finishScoring()" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-4 md:py-5 rounded-xl md:rounded-2xl shadow-xl tracking-widest text-xs md:text-sm uppercase">
                             PUANLAMAYI BİTİR
                         </button>
                     </div>
-                </div>
 
-                <div class="glass p-6 rounded-[2rem] border-l-4 border-emerald-400 bg-emerald-400/5">
-                    <h4 class="font-bold text-emerald-400 text-sm mb-2 uppercase tracking-tighter italic text-white">Canlı Değişim</h4>
-                    <p class="text-[11px] text-slate-400 leading-relaxed italic">Öğrenciler puan verdikçe ortalama yukarıda anlık olarak güncellenir. "Bitir" dediğinizde sonuç kalıcı listeye aktarılır.</p>
+                    <div class="pt-4 border-t border-white/5 flex items-center justify-between">
+                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">İsimleri Gizle</span>
+                        <label class="switch">
+                            <input type="checkbox" id="anonToggle" onchange="toggleAnonMode()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
                 </div>
             </div>
 
             <!-- İçerik Alanı -->
             <div id="contentArea" class="lg:col-span-9 h-full">
-                <!-- Öğretmen Görünümü -->
-                <div id="teacherDualView" class="hidden-view grid grid-cols-1 md:grid-cols-2 gap-8 h-full">
-                    <!-- Canlı Akış -->
-                    <div class="glass rounded-[3rem] overflow-hidden flex flex-col min-h-[500px] border-yellow-400/10">
-                        <div class="p-8 border-b border-white/5 flex justify-between items-center bg-white/5">
-                            <h3 class="font-bold text-lg italic text-white uppercase tracking-tighter">Gelen Oylar (<span id="voteCount" class="text-yellow-400">0</span>)</h3>
-                            <p id="activeStudentLabel" class="text-yellow-400 font-black uppercase italic tracking-wider"></p>
+                <!-- Öğretmen Liste Görünümü -->
+                <div id="teacherDualView" class="hidden-view grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 h-full">
+                    <div class="glass rounded-[2rem] md:rounded-[3rem] overflow-hidden flex flex-col min-h-[400px]">
+                        <div class="p-6 md:p-8 border-b border-white/5 flex justify-between items-center bg-white/5">
+                            <h3 class="font-bold text-sm md:text-lg italic text-white uppercase tracking-tighter">Detaylı Oylar (<span id="voteCount">0</span>)</h3>
+                            <p id="activeStudentLabel" class="text-yellow-400 font-black uppercase italic tracking-wider text-sm truncate max-w-[150px]"></p>
                         </div>
-                        <div id="votesGrid" class="p-8 grid grid-cols-2 gap-4 overflow-auto custom-scrollbar">
-                            <!-- Oylar Buraya -->
+                        <div id="votesGrid" class="p-6 grid grid-cols-1 gap-3 overflow-auto custom-scrollbar">
+                            <!-- Detaylı oylar: İsim + Cinsiyet + Puan -->
                         </div>
                     </div>
 
-                    <!-- Değerlendirme Geçmişi -->
-                    <div class="glass rounded-[3rem] overflow-hidden flex flex-col min-h-[500px]">
-                        <div class="p-8 border-b border-white/5 bg-indigo-500/10 flex justify-between items-center">
-                            <h3 class="font-bold text-lg flex items-center gap-2 uppercase tracking-tighter italic text-white">
-                                Geçmiş Liste
-                            </h3>
-                            <button onclick="exportAllToSheets()" id="bulkExportBtn" class="text-[10px] font-black bg-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-lg border border-emerald-500/20 hover:bg-emerald-500/30 transition-all uppercase tracking-widest hidden">
-                                Tümünü Aktar
+                    <div class="glass rounded-[2rem] md:rounded-[3rem] overflow-hidden flex flex-col min-h-[400px]">
+                        <div class="p-6 md:p-8 border-b border-white/5 bg-indigo-500/10 flex justify-between items-center text-white">
+                            <h3 class="font-bold text-sm md:text-lg uppercase tracking-tighter italic">Geçmiş Liste</h3>
+                            <button onclick="exportAllToSheets()" id="bulkExportBtn" class="text-[8px] md:text-[10px] font-black bg-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-lg border border-emerald-500/20 hidden uppercase tracking-widest">
+                                Hepsini Aktar
                             </button>
                         </div>
-                        <div id="historyList" class="p-6 space-y-4 overflow-auto custom-scrollbar flex-grow">
-                            <div class="text-center opacity-20 py-20 italic text-white">Henüz veri yok.</div>
+                        <div id="historyList" class="p-4 md:p-6 space-y-3 overflow-auto custom-scrollbar flex-grow text-white text-white">
+                            <div class="text-center opacity-20 py-10 italic text-sm">Veri yok.</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Öğrenci Puanlama Ekranı -->
-                <div id="studentVoteView" class="w-full max-w-2xl mx-auto hidden-view space-y-12 py-10">
-                    <div class="text-center space-y-4">
-                        <p class="text-xs font-bold text-indigo-400 uppercase tracking-[0.4em]">Değerlendirme Başladı</p>
-                        <h2 id="currentStudentDisplay" class="text-6xl font-black italic uppercase tracking-tighter text-white drop-shadow-2xl">...</h2>
+                <div id="studentVoteView" class="w-full max-w-2xl mx-auto hidden-view space-y-6 md:space-y-12 py-4 md:py-10 px-2">
+                    <div class="text-center space-y-2 md:space-y-4">
+                        <p class="text-[10px] md:text-xs font-bold text-indigo-400 uppercase tracking-[0.3em]">Sunum Değerlendiriliyor</p>
+                        <h2 id="currentStudentDisplay" class="text-4xl md:text-6xl font-black italic uppercase tracking-tighter text-white drop-shadow-2xl truncate">...</h2>
                     </div>
 
-                    <div id="voteButtons" class="glass p-12 rounded-[3.5rem] shadow-2xl relative overflow-hidden">
-                        <div class="grid grid-cols-5 gap-4" id="scoreGrid"></div>
+                    <div id="voteButtons" class="glass p-4 md:p-10 rounded-[2rem] md:rounded-[3.5rem] shadow-2xl">
+                        <div class="grid grid-cols-4 sm:grid-cols-7 gap-2 md:gap-3" id="scoreGrid"></div>
+                        <p class="text-center text-[10px] text-slate-500 mt-6 uppercase font-bold tracking-widest opacity-50">Değerlendirmeniz sadece öğretmene iletilir</p>
                     </div>
 
-                    <div id="voteSuccess" class="glass p-16 rounded-[3.5rem] text-center hidden-view animate-in zoom-in duration-500">
-                        <div class="w-24 h-24 bg-emerald-500/20 text-emerald-400 rounded-full mx-auto flex items-center justify-center mb-6 text-emerald-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    <div id="voteSuccess" class="glass p-10 md:p-16 rounded-[2rem] text-center hidden-view animate-in zoom-in">
+                        <div class="w-16 h-16 md:w-24 md:h-24 bg-emerald-500/20 text-emerald-400 rounded-full mx-auto flex items-center justify-center mb-4 text-emerald-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                         </div>
-                        <h3 class="text-3xl font-black text-white italic">Puanınız İletildi!</h3>
-                        <p class="text-slate-500 font-medium mt-2">Sıradaki sunumu bekleyin.</p>
+                        <h3 class="text-xl md:text-3xl font-black text-white italic">Puanınız İletildi!</h3>
+                        <p class="text-slate-500 text-xs md:text-sm mt-2">Lütfen sıradaki sunumu bekleyin.</p>
                     </div>
                 </div>
             </div>
@@ -217,13 +252,13 @@
     </div>
 
     <!-- Bildirim -->
-    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 glass px-10 py-5 rounded-[2rem] border-yellow-400/50 translate-y-32 opacity-0 transition-all duration-700 z-[100] font-bold text-yellow-400 text-sm shadow-2xl flex items-center gap-3">
-        <div class="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-        <span id="toastMsg">İşlem Başarılı</span>
+    <div id="toast" class="fixed bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 glass px-6 py-3 md:px-10 rounded-full border-yellow-400/50 translate-y-32 opacity-0 transition-all duration-700 z-[100] font-bold text-yellow-400 text-xs shadow-2xl flex items-center gap-2">
+        <div class="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse"></div>
+        <span id="toastMsg">...</span>
     </div>
 
     <script>
-        // --- Yapılandırmalar ---
+        // --- Firebase Config ---
         const firebaseConfig = {
             apiKey: "AIzaSyDF1juJ_HX3GQ3tYop9cUsSPuZ70-cID1s",
             authDomain: "gradelobby-64c60.firebaseapp.com",
@@ -235,7 +270,7 @@
         };
 
         const AUTO_SHEETS_URL = "https://script.google.com/macros/s/AKfycbwQiJWSFC45CIXjxzOVufPc4FEv4T1oFOdyea1qTUd2npgDnFq9ZNUXFhSNzlt4f3Y/exec";
-        const appId = "gradelobby-system-vfinal"; 
+        const appId = "gradelobby-v2-advanced"; 
         
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
@@ -250,28 +285,36 @@
         let historySub = null;
         let currentAvg = "0.0";
         let lastHistory = [];
+        let selectedGender = 'male'; // Default
+        let isLobbyAnon = false;
 
         const getLobbyPath = (code) => `artifacts/${appId}/public/data/lobbies/${code}`;
         const getVotesCollection = () => db.collection(`artifacts/${appId}/public/data/votes`);
         const getHistoryCollection = () => db.collection(`artifacts/${appId}/public/data/history`);
 
-        // Auth
         async function initAuth() {
             try {
                 await auth.signInAnonymously();
                 currentUser = auth.currentUser;
-            } catch (err) {
-                showToast("Firebase bağlantı hatası!");
-            }
+            } catch (err) { showToast("Bağlantı Hatası!"); }
         }
         initAuth();
 
+        function setGender(gender) {
+            selectedGender = gender;
+            document.getElementById('maleBtn').classList.toggle('active', gender === 'male');
+            document.getElementById('femaleBtn').classList.toggle('active', gender === 'female');
+        }
+
         async function selectRole(role) {
-            if (!currentUser) { await initAuth(); if (!currentUser) return showToast("Bağlantı bekleniyor..."); }
+            if (!currentUser) { await initAuth(); if (!currentUser) return showToast("Bağlanıyor..."); }
             currentRole = role;
             document.getElementById('roleView').classList.add('hidden-view');
             if (role === 'teacher') createLobby();
-            else document.getElementById('studentJoinView').classList.remove('hidden-view');
+            else {
+                document.getElementById('studentJoinView').classList.remove('hidden-view');
+                setGender('male'); // Reset UI
+            }
         }
 
         async function createLobby() {
@@ -282,19 +325,29 @@
                     code: code,
                     teacherId: currentUser.uid,
                     currentStudent: '',
+                    isAnonymous: false,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 setupUI('teacher');
                 startLobbyListeners(code);
-            } catch (e) { showToast("Oda kurulamadı!"); }
+            } catch (e) { showToast("Hata!"); }
         }
 
         async function joinLobby() {
             const code = document.getElementById('lobbyCodeInput').value.trim().toUpperCase();
+            const name = document.getElementById('studentNameInput').value.trim();
+            
+            if (code.length < 4) return showToast("Kod girin!");
+            if (name.length < 2) return showToast("Geçerli bir isim girin!");
+
             try {
                 const docRef = await db.doc(getLobbyPath(code)).get();
-                if (!docRef.exists) return showToast("Geçersiz Kod!");
+                if (!docRef.exists) return showToast("Oda bulunamadı!");
+                
                 currentLobbyCode = code;
+                currentUser.displayName = name; // Local state for identification
+                currentUser.gender = selectedGender;
+                
                 setupUI('student');
                 startLobbyListeners(code);
             } catch (e) { showToast("Erişim hatası."); }
@@ -304,7 +357,7 @@
             document.getElementById('studentJoinView').classList.add('hidden-view');
             document.getElementById('mainDashboard').classList.remove('hidden-view');
             document.getElementById('displayCode').innerText = currentLobbyCode;
-            document.getElementById('roleBadge').innerText = role === 'teacher' ? 'YÖNETİCİ' : 'ÖĞRENCİ';
+            document.getElementById('roleBadge').innerText = role === 'teacher' ? 'YÖNETİCİ' : currentUser.displayName.toUpperCase();
             if (role === 'teacher') {
                 document.getElementById('teacherStats').classList.remove('hidden-view');
                 document.getElementById('teacherControls').classList.remove('hidden-view');
@@ -319,6 +372,10 @@
             lobbySub = db.doc(getLobbyPath(code)).onSnapshot(doc => {
                 if (!doc.exists) return;
                 const data = doc.data();
+                isLobbyAnon = data.isAnonymous;
+                if (currentRole === 'teacher') {
+                    document.getElementById('anonToggle').checked = data.isAnonymous;
+                }
                 if (data.currentStudent !== activeStudent) {
                     activeStudent = data.currentStudent;
                     handleLobbyStateChange();
@@ -345,12 +402,19 @@
             }
         }
 
+        async function toggleAnonMode() {
+            const isAnon = document.getElementById('anonToggle').checked;
+            try {
+                await db.doc(getLobbyPath(currentLobbyCode)).update({ isAnonymous: isAnon });
+                showToast(isAnon ? "Anonim mod açıldı." : "İsimler görünür durumda.");
+            } catch (e) { showToast("Ayarlar güncellenemedi."); }
+        }
+
         function handleLobbyStateChange() {
             if (currentRole === 'teacher') {
                 document.getElementById('activeStudentLabel').innerText = activeStudent;
                 const finishSec = document.getElementById('finishSection');
                 const startSec = document.getElementById('startSection');
-                
                 if (activeStudent) {
                     document.getElementById('finishStudentName').innerText = activeStudent;
                     finishSec.classList.remove('hidden-view');
@@ -366,44 +430,29 @@
             }
         }
 
-        // Sunumu Başlat
         async function updateLobbyStudent() {
             const input = document.getElementById('presentingStudentInput');
             const newName = input.value.trim();
-            if (!newName) return showToast("Lütfen isim girin.");
-
+            if (!newName) return showToast("İsim girin!");
             try {
-                await db.doc(getLobbyPath(currentLobbyCode)).update({
-                    currentStudent: newName
-                });
+                await db.doc(getLobbyPath(currentLobbyCode)).update({ currentStudent: newName });
                 input.value = '';
-                showToast("Sunum başlatıldı! Puanlar bekleniyor...");
-            } catch (e) { showToast("Sunum güncellenemedi."); }
+                showToast("Sunum başladı!");
+            } catch (e) { showToast("Hata!"); }
         }
 
-        // Puanlamayı Bitir ve Kaydet
         async function finishScoring() {
             if (!activeStudent) return;
-            
             try {
-                // 1. Mevcut ortalamayı geçmiş listesine (History) kaydet
                 await getHistoryCollection().add({
                     lobbyId: currentLobbyCode,
                     studentName: activeStudent,
                     score: currentAvg,
                     timestamp: Date.now()
                 });
-
-                // 2. Lobi durumunu boşalt (Herkesi bekleme moduna sokar)
-                await db.doc(getLobbyPath(currentLobbyCode)).update({
-                    currentStudent: ""
-                });
-
-                showToast(`${activeStudent} puanlaması kaydedildi.`);
-            } catch (e) {
-                console.error(e);
-                showToast("Kaydetme hatası!");
-            }
+                await db.doc(getLobbyPath(currentLobbyCode)).update({ currentStudent: "" });
+                showToast("Kaydedildi.");
+            } catch (e) { showToast("Hata!"); }
         }
 
         async function submitVote(score) {
@@ -411,26 +460,38 @@
             try {
                 await getVotesCollection().add({
                     lobbyId: currentLobbyCode,
+                    voterName: currentUser.displayName,
+                    voterGender: currentUser.gender,
                     studentName: activeStudent,
                     score: score,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 document.getElementById('voteButtons').classList.add('hidden-view');
                 document.getElementById('voteSuccess').classList.remove('hidden-view');
-            } catch (e) { showToast("Puan iletilemedi!"); }
+            } catch (e) { showToast("Hata!"); }
         }
 
         function updateTeacherStats(votes) {
             const grid = document.getElementById('votesGrid');
-            const countEl = document.getElementById('voteCount');
             const avgEl = document.getElementById('avgDisplay');
-            countEl.innerText = votes.length;
-            grid.innerHTML = votes.map((v, i) => `
-                <div class="bg-white/5 p-6 rounded-3xl flex items-center justify-between border border-white/10 animate-in zoom-in">
-                    <span class="text-[10px] text-purple-400 font-black tracking-widest uppercase">#${i+1}</span>
-                    <span class="text-3xl font-black italic tracking-tighter text-white">${v.score}</span>
-                </div>
-            `).join('');
+            document.getElementById('voteCount').innerText = votes.length;
+            
+            grid.innerHTML = votes.map((v) => {
+                const genderIcon = v.voterGender === 'male' ? '<span class="text-blue-400">♂</span>' : '<span class="text-pink-400">♀</span>';
+                const nameDisplay = isLobbyAnon ? 'Gizli Kullanıcı' : v.voterName;
+                const iconDisplay = isLobbyAnon ? '👤' : genderIcon;
+
+                return `
+                    <div class="bg-white/5 p-3 rounded-xl border border-white/5 flex items-center justify-between animate-in zoom-in">
+                        <div class="flex items-center gap-3">
+                            <span class="text-lg">${iconDisplay}</span>
+                            <span class="text-xs font-bold text-slate-300 truncate max-w-[120px]">${nameDisplay}</span>
+                        </div>
+                        <span class="text-xl font-black text-yellow-400 italic tabular-nums">${v.score}</span>
+                    </div>
+                `;
+            }).join('');
+
             if (votes.length > 0) {
                 const total = votes.reduce((acc, curr) => acc + curr.score, 0);
                 currentAvg = (total / votes.length).toFixed(1);
@@ -444,16 +505,16 @@
         function renderHistory(historyData) {
             const container = document.getElementById('historyList');
             if (historyData.length === 0) {
-                container.innerHTML = `<div class="text-center opacity-20 py-20 italic text-white">Henüz veri yok.</div>`;
+                container.innerHTML = `<div class="text-center opacity-20 py-10 italic text-sm">Geçmiş boş.</div>`;
                 return;
             }
             container.innerHTML = historyData.map(h => `
-                <div class="glass p-5 rounded-2xl flex items-center justify-between border-white/5 hover:bg-white/10 transition-colors animate-in slide-in-from-right-2">
-                    <div class="flex flex-col">
-                        <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest">BİTTİ</span>
-                        <span class="text-lg font-bold tracking-tight text-white uppercase italic">${h.studentName}</span>
+                <div class="glass p-4 rounded-xl flex items-center justify-between border-white/5">
+                    <div class="flex flex-col truncate pr-2">
+                        <span class="text-[8px] text-emerald-400 font-bold uppercase tracking-widest">Tamamlandı</span>
+                        <span class="text-base font-bold text-white uppercase italic truncate">${h.studentName}</span>
                     </div>
-                    <div class="bg-yellow-400 text-indigo-950 px-4 py-2 rounded-xl font-black italic text-xl shadow-lg">
+                    <div class="bg-yellow-400 text-indigo-950 px-3 py-1 rounded-lg font-black italic text-lg shrink-0">
                         ${h.score}
                     </div>
                 </div>
@@ -462,30 +523,21 @@
 
         function renderScoreButtons() {
             const grid = document.getElementById('scoreGrid');
-            grid.innerHTML = [1,2,3,4,5,6,7,8,9,10].map(n => `
-                <button onclick="submitVote(${n*10})" class="vote-btn aspect-square glass rounded-2xl font-black text-2xl border-none text-white">
-                    ${n*10}
+            grid.innerHTML = Array.from({length: 21}, (_, i) => i).map(n => `
+                <button onclick="submitVote(${n})" class="vote-btn aspect-square glass rounded-xl font-black text-lg md:text-xl border-none text-white bg-white/10">
+                    ${n}
                 </button>
             `).join('');
         }
 
         async function exportAllToSheets() {
             let exportData = [...lastHistory];
-            
             if (activeStudent && currentAvg !== "0.0") {
-                exportData.push({
-                    studentName: activeStudent,
-                    score: currentAvg,
-                    timestamp: Date.now()
-                });
+                exportData.push({ studentName: activeStudent, score: currentAvg, timestamp: Date.now() });
             }
+            if (exportData.length === 0) return showToast("Veri yok.");
 
-            if (exportData.length === 0) return showToast("Aktarılacak veri bulunamadı.");
-
-            const btn = document.getElementById('headerExportBtn');
-            btn.disabled = true;
-            showToast("Tüm liste Sheets'e iletiliyor...");
-
+            showToast("Gönderiliyor...");
             const payload = exportData.map(h => ({
                 name: h.studentName,
                 score: h.score,
@@ -496,16 +548,11 @@
                 await fetch(AUTO_SHEETS_URL, { 
                     method: 'POST', 
                     mode: 'no-cors',
-                    cache: 'no-cache',
                     headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify(payload) 
                 });
-                showToast(`Başarılı! ${payload.length} kayıt aktarıldı.`);
-            } catch (e) { 
-                console.error("Sheets hatası:", e);
-                showToast("Aktarım hatası!"); 
-            }
-            finally { btn.disabled = false; }
+                showToast("Tabloya başarıyla iletildi!");
+            } catch (e) { showToast("Hata!"); }
         }
 
         function showToast(msg) {
