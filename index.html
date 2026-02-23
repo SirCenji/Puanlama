@@ -57,17 +57,17 @@
             <h1 class="text-6xl font-black italic tracking-tighter uppercase leading-none mb-2 text-white">
                 GRADE<span class="text-yellow-400">LOBBY</span>
             </h1>
-            <p class="text-purple-300/60 font-semibold tracking-[0.3em] text-xs uppercase">Bulut Tabanlı Değerlendirme</p>
+            <p class="text-purple-300/60 font-semibold tracking-[0.3em] text-xs uppercase text-white">Bulut Tabanlı Değerlendirme</p>
         </div>
 
-        <div class="grid grid-cols-1 gap-4">
+        <div class="grid grid-cols-1 gap-4 text-white">
             <button onclick="selectRole('teacher')" class="glass p-10 rounded-[2.5rem] hover:bg-white/5 transition-all group flex flex-col items-center gap-4">
                 <div class="bg-yellow-400 p-5 rounded-3xl text-indigo-950 group-hover:rotate-12 transition-transform shadow-xl shadow-yellow-400/20">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                 </div>
                 <div class="text-center">
                     <span class="text-2xl font-black tracking-tight block text-white">Öğretmen Girişi</span>
-                    <span class="text-[10px] text-slate-500 uppercase tracking-widest">Odayı Kur ve Yönet</span>
+                    <span class="text-[10px] text-slate-500 uppercase tracking-widest text-white">Odayı Kur ve Yönet</span>
                 </div>
             </button>
 
@@ -77,7 +77,7 @@
                 </div>
                 <div class="text-center">
                     <span class="text-2xl font-black tracking-tight block text-white">Öğrenci Girişi</span>
-                    <span class="text-[10px] text-slate-500 uppercase tracking-widest">Kodla Giriş Yap</span>
+                    <span class="text-[10px] text-slate-500 uppercase tracking-widest text-white">Kodla Giriş Yap</span>
                 </div>
             </button>
         </div>
@@ -88,7 +88,7 @@
         <div class="glass p-10 rounded-[3rem] space-y-8 relative overflow-hidden">
             <h2 class="text-3xl font-black text-center italic tracking-tight text-white uppercase">Odaya Katıl</h2>
             <div class="space-y-4">
-                <input type="text" id="lobbyCodeInput" placeholder="ODA KODU" class="input-glass w-full px-8 py-5 rounded-2xl text-center text-3xl font-black tracking-[0.3em] uppercase">
+                <input type="text" id="lobbyCodeInput" placeholder="ODA KODU" class="input-glass w-full px-8 py-5 rounded-2xl text-center text-3xl font-black tracking-[0.3em] uppercase text-white">
                 <button onclick="joinLobby()" class="w-full bg-yellow-400 text-indigo-950 font-black py-5 rounded-2xl shadow-2xl hover:bg-yellow-300 transition-all text-lg tracking-widest uppercase">GİRİŞ YAP</button>
                 <button onclick="location.reload()" class="w-full text-slate-500 text-xs font-bold uppercase tracking-widest opacity-50 hover:opacity-100 transition-opacity">Geri Dön</button>
             </div>
@@ -155,7 +155,7 @@
                     <div class="glass rounded-[3rem] overflow-hidden flex flex-col min-h-[500px] border-yellow-400/10">
                         <div class="p-8 border-b border-white/5 flex justify-between items-center bg-white/5">
                             <h3 class="font-bold text-lg italic text-white uppercase tracking-tighter">Gelen Oylar (<span id="voteCount" class="text-yellow-400">0</span>)</h3>
-                            <p id="activeStudentLabel" class="text-yellow-400 font-black uppercase italic tracking-wider"></p>
+                            <p id="activeStudentLabel" class="text-yellow-400 font-black uppercase italic tracking-wider text-white"></p>
                         </div>
                         <div id="votesGrid" class="p-8 grid grid-cols-2 gap-4 overflow-auto custom-scrollbar">
                             <!-- Oylar Buraya -->
@@ -173,7 +173,7 @@
                             </button>
                         </div>
                         <div id="historyList" class="p-6 space-y-4 overflow-auto custom-scrollbar flex-grow">
-                            <div class="text-center opacity-20 py-20 italic">Henüz veri yok.</div>
+                            <div class="text-center opacity-20 py-20 italic text-white">Henüz veri yok.</div>
                         </div>
                     </div>
                 </div>
@@ -190,7 +190,7 @@
                     </div>
 
                     <div id="voteSuccess" class="glass p-16 rounded-[3.5rem] text-center hidden-view animate-in zoom-in duration-500">
-                        <div class="w-24 h-24 bg-emerald-500/20 text-emerald-400 rounded-full mx-auto flex items-center justify-center mb-6">
+                        <div class="w-24 h-24 bg-emerald-500/20 text-emerald-400 rounded-full mx-auto flex items-center justify-center mb-6 text-emerald-400">
                             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                         </div>
                         <h3 class="text-3xl font-black text-white italic">Puanınız İletildi!</h3>
@@ -219,8 +219,8 @@
             measurementId: "G-T4N14WHMT3"
         };
 
-        // İstediğiniz Google Apps Script URL'si
-        const AUTO_SHEETS_URL = "https://script.google.com/macros/s/AKfycbxITp3CUpJpa9vS1rFHOgg39GJlAiNYFsnHqgso4PAHVpYXooxi49Cf8cye3FDyLAzj/exec";
+        // Güncellenmiş Google Apps Script URL'si
+        const AUTO_SHEETS_URL = "https://script.google.com/macros/s/AKfycbwQiJWSFC45CIXjxzOVufPc4FEv4T1oFOdyea1qTUd2npgDnFq9ZNUXFhSNzlt4f3Y/exec";
         const appId = "gradelobby-system-vfinal"; 
         
         firebase.initializeApp(firebaseConfig);
@@ -433,7 +433,7 @@
 
             const btn = document.getElementById('singleExportBtn');
             btn.disabled = true;
-            showToast("Sheets'e gönderiliyor...");
+            showToast("İletiliyor...");
 
             const payload = { 
                 name: activeStudent, 
@@ -442,7 +442,6 @@
             };
 
             try {
-                // Google Apps Script için en güvenli gönderim yöntemi
                 await fetch(AUTO_SHEETS_URL, { 
                     method: 'POST', 
                     mode: 'no-cors',
@@ -452,6 +451,7 @@
                 });
                 showToast("Veri başarıyla aktarıldı!");
             } catch (e) { 
+                console.error("Sheets hatası:", e);
                 showToast("Aktarım hatası!"); 
             }
             finally { btn.disabled = false; }
@@ -474,12 +474,13 @@
                 await fetch(AUTO_SHEETS_URL, { 
                     method: 'POST', 
                     mode: 'no-cors',
-                    cache: 'no-cache',
                     headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify(payload) 
                 });
-                showToast("Tüm geçmiş aktarıldı!");
-            } catch (e) { showToast("Hata oluştu!"); }
+                showToast("Tüm liste başarıyla iletildi!");
+            } catch (e) { 
+                showToast("Hata oluştu!"); 
+            }
             finally { 
                 btn.innerText = "Tümünü Aktar";
                 btn.disabled = false; 
