@@ -1,350 +1,456 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GradeGlass Pro - Öğretmen Paneli</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --accent-yellow: #fbbf24;
-            --deep-purple: #1e1b4b;
+import React, { useState, useEffect, useMemo } from 'react';
+import { initializeApp } from 'firebase/app';
+import { 
+  getFirestore, collection, doc, setDoc, onSnapshot, 
+  query, where, deleteDoc, updateDoc, addDoc 
+} from 'firebase/firestore';
+import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from 'firebase/auth';
+import { 
+  Users, UserCheck, Play, LogOut, Send, 
+  Settings, Download, Shield, Trophy, Star, ChevronRight, Loader2
+} from 'lucide-react';
+
+// --- Firebase Yapılandırması ---
+const firebaseConfig = JSON.parse(__firebase_config);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'gradesync-default';
+
+const App = () => {
+  const [user, setUser] = useState(null);
+  const [role, setRole] = useState(null); // 'teacher' | 'student'
+  const [lobbyCode, setLobbyCode] = useState('');
+  const [currentLobby, setCurrentLobby] = useState(null);
+  const [presentingStudent, setPresentingStudent] = useState('');
+  const [votes, setVotes] = useState([]);
+  const [myVote, setMyVote] = useState(null);
+  const [sheetUrl, setSheetUrl] = useState(localStorage.getItem('gs_url') || '');
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
+
+  // 1. Kimlik Doğrulama (MANDATORY RULE 3 & React Pattern)
+  useEffect(() => {
+    const initAuth = async () => {
+      try {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
         }
+      } catch (err) {
+        console.error("Kimlik doğrulama hatası:", err);
+      } finally {
+        setIsAuthLoading(false);
+      }
+    };
+    initAuth();
 
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: radial-gradient(circle at top right, #4c1d95, #1e1b4b, #0f172a);
-            background-attachment: fixed;
-            min-height: 100vh;
-            color: #f8fafc;
-            overflow-x: hidden;
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // 2. Lobi Dinleme (Öğretmen ve Öğrenci için ortak)
+  useEffect(() => {
+    if (!user || !lobbyCode || !role) return;
+
+    const lobbyDoc = doc(db, 'artifacts', appId, 'public', 'data', 'lobbies', lobbyCode);
+    const unsubscribe = onSnapshot(lobbyDoc, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setCurrentLobby(data);
+        // Öğrenci ise ve sunum yapan değişmişse oylama hakkını sıfırla
+        if (role === 'student' && data.currentStudent !== presentingStudent) {
+          setPresentingStudent(data.currentStudent);
+          setMyVote(null);
         }
+      } else if (role === 'student') {
+        showToast("Oda kapatıldı veya bulunamadı.");
+        setRole(null);
+      }
+    }, (err) => {
+      console.error("Lobi senkronizasyon hatası:", err);
+    });
 
-        .glass {
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-        }
+    return () => unsubscribe();
+  }, [user, lobbyCode, role]);
 
-        .input-glass {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+  // 3. Puanları Dinleme (Sadece Öğretmen Görür)
+  useEffect(() => {
+    if (!user || role !== 'teacher' || !lobbyCode) return;
 
-        .input-glass:focus {
-            border-color: var(--accent-yellow);
-            background: rgba(255, 255, 255, 0.1);
-            box-shadow: 0 0 20px rgba(251, 191, 36, 0.15);
-            outline: none;
-        }
+    const votesCol = collection(db, 'artifacts', appId, 'public', 'data', 'votes');
+    // Not: Compound query'lerden kaçınmak için (Rule 2) tüm oyları çekip JS'de filtreliyoruz
+    const unsubscribe = onSnapshot(votesCol, (snap) => {
+      const allVotes = snap.docs
+        .map(d => d.data())
+        .filter(v => v.lobbyId === lobbyCode);
+      setVotes(allVotes);
+    }, (err) => {
+      console.error("Oylama senkronizasyon hatası:", err);
+    });
 
-        .privacy-active {
-            filter: blur(25px) grayscale(0.5);
-            pointer-events: none;
-            user-select: none;
-            opacity: 0.6;
-        }
+    return () => unsubscribe();
+  }, [user, role, lobbyCode]);
 
-        .btn-yellow {
-            background: var(--accent-yellow);
-            color: #1e1b4b;
-            transition: all 0.2s ease;
-        }
+  // --- Fonksiyonlar ---
 
-        .btn-yellow:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(251, 191, 36, 0.3);
-            background: #fcd34d;
-        }
+  const createLobby = async () => {
+    if (!user) {
+      showToast("Kullanıcı oturumu henüz hazır değil.");
+      return;
+    }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--accent-yellow); border-radius: 10px; }
+    try {
+      const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+      const newLobby = {
+        code,
+        teacherId: user.uid,
+        currentStudent: '',
+        createdAt: Date.now()
+      };
+      
+      // Path Rule 1: /artifacts/{appId}/public/data/{collectionName}
+      await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'lobbies', code), newLobby);
+      
+      setLobbyCode(code);
+      setRole('teacher');
+      showToast(`Lobi oluşturuldu: ${code}`);
+    } catch (err) {
+      console.error("Lobi oluşturma hatası:", err);
+      showToast("Lobi oluşturulamadı.");
+    }
+  };
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-slide { animation: slideIn 0.5s ease forwards; }
-    </style>
-</head>
-<body class="antialiased p-4 md:p-10">
+  const joinLobby = (e) => {
+    e.preventDefault();
+    if (!user) return;
+    if (lobbyCode.length < 4) {
+      showToast("Geçerli bir kod girin.");
+      return;
+    }
+    setRole('student');
+  };
 
-    <div class="max-w-7xl mx-auto">
-        <!-- Üst Bilgi Çubuğu -->
-        <header class="flex flex-col md:flex-row justify-between items-center mb-12 gap-6 animate-slide">
-            <div class="flex items-center gap-5">
-                <div class="w-14 h-14 glass rounded-2xl flex items-center justify-center border-yellow-500/30">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                    </svg>
-                </div>
-                <div>
-                    <h1 class="text-4xl font-extrabold tracking-tight">Grade<span class="text-yellow-400 font-light italic">Glass</span></h1>
-                    <p class="text-purple-300/70 text-sm tracking-wide">İNGİLİZCE ÖĞRETMENİ ÖZEL PANELİ</p>
-                </div>
+  const startPresentation = async () => {
+    if (!user || !presentingStudent) return;
+    try {
+      const lobbyRef = doc(db, 'artifacts', appId, 'public', 'data', 'lobbies', lobbyCode);
+      await updateDoc(lobbyRef, { currentStudent: presentingStudent });
+      setVotes([]); // Yeni sunum için yerel state temizliği
+      showToast(`${presentingStudent} sunumu başladı!`);
+    } catch (err) {
+      console.error("Sunum başlatma hatası:", err);
+    }
+  };
+
+  const submitVote = async (score) => {
+    if (!user || !currentLobby || !currentLobby.currentStudent || myVote !== null) return;
+    
+    try {
+      const voteData = {
+        lobbyId: lobbyCode,
+        voterId: user.uid,
+        studentName: currentLobby.currentStudent,
+        score: score,
+        timestamp: Date.now()
+      };
+      
+      await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'votes'), voteData);
+      setMyVote(score);
+      showToast("Puanın başarıyla iletildi!");
+    } catch (err) {
+      console.error("Oylama hatası:", err);
+      showToast("Puan gönderilemedi.");
+    }
+  };
+
+  const sendToSheets = async () => {
+    if (!sheetUrl || votes.length === 0 || !currentLobby) return;
+    const avg = calculateAverage();
+    const reportData = {
+      name: currentLobby.currentStudent,
+      category: "Sınıf Sunumu",
+      score: avg,
+      time: new Date().toLocaleString('tr-TR')
+    };
+
+    try {
+      await fetch(sheetUrl, { 
+        method: 'POST', 
+        mode: 'no-cors', 
+        body: JSON.stringify(reportData) 
+      });
+      showToast("Sonuçlar Google Sheets'e gönderildi!");
+    } catch (e) {
+      showToast("Sheets gönderim hatası!");
+    }
+  };
+
+  const calculateAverage = () => {
+    if (!currentLobby) return 0;
+    const relevantVotes = votes.filter(v => v.studentName === currentLobby.currentStudent);
+    if (relevantVotes.length === 0) return 0;
+    const sum = relevantVotes.reduce((acc, curr) => acc + curr.score, 0);
+    return (sum / relevantVotes.length).toFixed(1);
+  };
+
+  // Toast Sistemi
+  const [toast, setToast] = useState({ show: false, msg: '' });
+  const showToast = (msg) => {
+    setToast({ show: true, msg });
+    setTimeout(() => setToast({ show: false, msg: '' }), 3000);
+  };
+
+  // --- UI Bileşenleri ---
+
+  // Yükleme Ekranı
+  if (isAuthLoading) {
+    return (
+      <div className="min-h-screen bg-[#1e1b4b] flex flex-col items-center justify-center p-6 text-white">
+        <Loader2 className="w-12 h-12 text-amber-400 animate-spin mb-4" />
+        <p className="text-purple-200 animate-pulse">Sistem hazırlanıyor...</p>
+      </div>
+    );
+  }
+
+  // Giriş Ekranı
+  if (!role) {
+    return (
+      <div className="min-h-screen bg-[#1e1b4b] flex items-center justify-center p-6 font-sans text-white">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-[-10%] right-[-10%] w-96 h-96 bg-purple-600/20 blur-[100px] rounded-full" />
+          <div className="absolute bottom-[-10%] left-[-10%] w-96 h-96 bg-amber-400/10 blur-[100px] rounded-full" />
+        </div>
+        
+        <div className="w-full max-w-md space-y-8 relative z-10 animate-in fade-in zoom-in duration-500">
+          <div className="text-center">
+            <div className="w-20 h-20 bg-amber-400 rounded-3xl mx-auto flex items-center justify-center shadow-2xl mb-6">
+              <Trophy className="text-indigo-950 w-10 h-10" />
             </div>
+            <h1 className="text-4xl font-black tracking-tighter italic">GRADE<span className="text-amber-400">LOBBY</span></h1>
+            <p className="text-slate-400 mt-2">İnteraktif Sınıf Değerlendirme Sistemi</p>
+          </div>
 
-            <div class="flex items-center gap-4">
-                <div class="glass px-6 py-3 rounded-2xl">
-                    <span class="text-[10px] uppercase tracking-[0.2em] text-purple-400 block mb-1">Mevcut Liste</span>
-                    <span id="studentCount" class="text-2xl font-bold text-yellow-400">0</span>
-                    <span class="text-xs text-purple-300 ml-1 italic">Öğrenci</span>
-                </div>
-                <button id="exportExcel" class="btn-yellow px-8 py-4 rounded-2xl font-bold flex items-center gap-3 shadow-xl">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-                    </svg>
-                    RAPOR AL (CSV)
+          <div className="grid grid-cols-1 gap-4">
+            <button 
+              onClick={createLobby} 
+              disabled={!user}
+              className="group bg-white/5 hover:bg-white/10 border border-white/10 p-8 rounded-[2.5rem] transition-all flex flex-col items-center gap-3 disabled:opacity-50"
+            >
+              <Users className="w-8 h-8 text-amber-400 group-hover:scale-110 transition-transform" />
+              <div className="text-lg font-bold">Öğretmen Girişi</div>
+              <p className="text-xs text-slate-500">Yeni bir oturum ve kod oluştur</p>
+            </button>
+
+            <div className="bg-white/5 border border-white/10 p-8 rounded-[2.5rem] flex flex-col items-center gap-4">
+              <UserCheck className="w-8 h-8 text-indigo-400" />
+              <div className="text-lg font-bold">Öğrenci Girişi</div>
+              <form onSubmit={joinLobby} className="w-full flex gap-2">
+                <input 
+                  type="text" 
+                  placeholder="ODA KODU" 
+                  value={lobbyCode}
+                  onChange={(e) => setLobbyCode(e.target.value.toUpperCase())}
+                  className="flex-1 bg-white/5 border border-white/10 px-4 py-3 rounded-xl focus:border-amber-400 outline-none text-center font-bold tracking-widest"
+                />
+                <button 
+                  type="submit" 
+                  disabled={!user}
+                  className="bg-amber-400 text-indigo-950 px-6 py-3 rounded-xl font-bold hover:bg-amber-300 transition-colors disabled:opacity-50"
+                >
+                  GİR
                 </button>
+              </form>
             </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Panel Ekranı
+  return (
+    <div className="min-h-screen bg-[#0f172a] text-white p-4 md:p-8 font-sans">
+      <div className="max-w-6xl mx-auto space-y-8">
+        
+        {/* Header */}
+        <header className="flex flex-col md:flex-row justify-between items-center gap-6 bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-3xl">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-amber-400 rounded-xl flex items-center justify-center text-indigo-950 font-black">
+              {lobbyCode}
+            </div>
+            <div>
+              <h2 className="text-xl font-bold">Oda: {lobbyCode}</h2>
+              <p className="text-xs text-slate-400 uppercase tracking-widest">
+                {role === 'teacher' ? 'Yönetici Paneli' : 'Öğrenci Ekranı'}
+              </p>
+            </div>
+          </div>
+
+          {role === 'teacher' && (
+            <div className="flex items-center gap-6">
+              <div className="text-center">
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Anlık Ortalama</p>
+                <div className="text-4xl font-black text-amber-400 italic leading-none">{calculateAverage()}</div>
+              </div>
+              <div className="h-10 w-px bg-white/10" />
+              <div className="flex gap-2">
+                <button onClick={() => setIsSettingsOpen(true)} className="p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors"><Settings className="w-5 h-5 text-slate-400" /></button>
+                <button onClick={sendToSheets} className="p-3 bg-emerald-500/20 text-emerald-400 rounded-xl hover:bg-emerald-500/30 transition-colors" title="Sheets'e Gönder"><Download className="w-5 h-5" /></button>
+                <button onClick={() => window.location.reload()} className="p-3 bg-rose-500/20 text-rose-400 rounded-xl hover:bg-rose-500/30 transition-colors"><LogOut className="w-5 h-5" /></button>
+              </div>
+            </div>
+          )}
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-            <!-- Sol Panel: Giriş -->
-            <div class="lg:col-span-4 space-y-6 animate-slide" style="animation-delay: 0.1s">
-                <div class="glass p-8 rounded-[2rem] relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-yellow-400/5 rounded-full blur-3xl -mr-16 -mt-16"></div>
-                    
-                    <h2 class="text-xl font-bold mb-8 flex items-center gap-3">
-                        <span class="w-8 h-1 bg-yellow-400 rounded-full"></span>
-                        Yeni Puan Girişi
-                    </h2>
-                    
-                    <form id="scoreForm" class="space-y-6">
-                        <div class="space-y-2">
-                            <label class="text-xs font-semibold text-purple-300/80 uppercase tracking-widest ml-1">Öğrenci Ad Soyad</label>
-                            <input type="text" id="nameInput" required 
-                                class="input-glass w-full px-6 py-4 rounded-2xl text-lg placeholder:text-white/20"
-                                placeholder="Burak Yılmaz">
-                        </div>
-
-                        <div class="space-y-2">
-                            <label class="text-xs font-semibold text-purple-300/80 uppercase tracking-widest ml-1">Değerlendirme</label>
-                            <select id="categoryInput" class="input-glass w-full px-6 py-4 rounded-2xl text-white appearance-none cursor-pointer">
-                                <option class="bg-indigo-950" value="Speaking Performance">Speaking Performance</option>
-                                <option class="bg-indigo-950" value="Writing Assignment">Writing Assignment</option>
-                                <option class="bg-indigo-950" value="Listening Test">Listening Test</option>
-                                <option class="bg-indigo-950" value="Class Participation">Class Participation</option>
-                            </select>
-                        </div>
-
-                        <div class="space-y-2">
-                            <label class="text-xs font-semibold text-purple-300/80 uppercase tracking-widest ml-1">Puan</label>
-                            <input type="number" id="scoreInput" min="0" max="100" required 
-                                class="input-glass w-full px-6 py-4 rounded-2xl text-3xl font-bold text-center text-yellow-400"
-                                placeholder="--">
-                        </div>
-
-                        <button type="submit" class="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-5 rounded-2xl border border-white/10 transition-all flex items-center justify-center gap-3 group">
-                            KAYDET
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                            </svg>
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Gizlilik Kontrolü -->
-                <div class="glass p-6 rounded-3xl flex items-center justify-between border-l-4 border-yellow-400">
-                    <div>
-                        <h3 class="font-bold text-yellow-400">Öğrenci Görüşü</h3>
-                        <p class="text-[11px] text-purple-300/60 uppercase tracking-tighter">Listeyi gizlemek için aktifleştirin</p>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+          {/* Öğretmen Dashboard */}
+          {role === 'teacher' && (
+            <>
+              <div className="lg:col-span-4 space-y-6">
+                <div className="bg-white/5 border border-white/10 p-8 rounded-[2rem] shadow-2xl">
+                  <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
+                    <Play className="w-5 h-5 text-amber-400" /> Sunum Başlat
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <label className="text-[10px] text-slate-500 font-bold uppercase tracking-widest ml-1">Tahtadaki Öğrenci</label>
+                      <input 
+                        type="text" 
+                        value={presentingStudent}
+                        onChange={(e) => setPresentingStudent(e.target.value)}
+                        className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-2xl outline-none focus:border-amber-400 text-lg font-bold"
+                        placeholder="İsim girin..."
+                      />
                     </div>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" id="privacyToggle" class="sr-only peer">
-                        <div class="w-14 h-8 bg-white/5 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-yellow-400"></div>
-                    </label>
+                    <button 
+                      onClick={startPresentation}
+                      className="w-full bg-indigo-600 hover:bg-indigo-500 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-500/20"
+                    >
+                      TAHTAYA ÇIKAR <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </div>
                 </div>
+
+                <div className="bg-amber-400/5 border border-amber-400/10 p-6 rounded-[2rem]">
+                  <h4 className="font-bold text-amber-400 flex items-center gap-2 mb-3"><Shield className="w-4 h-4" /> Gizlilik Bilgisi</h4>
+                  <p className="text-xs text-slate-400 leading-relaxed">Öğrenciler şu an sadece oylama butonlarını görüyor. Diğer öğrencilerin verdiği puanlar sadece bu ekranda görünür.</p>
+                </div>
+              </div>
+
+              <div className="lg:col-span-8">
+                <div className="bg-white/5 border border-white/10 rounded-[2.5rem] overflow-hidden flex flex-col h-full min-h-[500px]">
+                  <div className="p-8 border-b border-white/10 flex items-center justify-between">
+                    <h3 className="text-lg font-bold">Gelen Puanlar ({votes.filter(v => v.studentName === currentLobby?.currentStudent).length})</h3>
+                  </div>
+                  <div className="flex-grow overflow-auto p-8 grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {votes.filter(v => v.studentName === currentLobby?.currentStudent).map((v, i) => (
+                      <div key={i} className="bg-white/5 border border-white/10 p-4 rounded-2xl flex items-center justify-between animate-in slide-in-from-bottom-2 duration-300">
+                        <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-[10px] text-indigo-300 font-bold">#{i+1}</div>
+                        <div className="text-2xl font-black text-white italic">{v.score}</div>
+                      </div>
+                    ))}
+                    {votes.length === 0 && (
+                      <div className="col-span-full flex flex-col items-center justify-center opacity-20 py-20">
+                        <Star className="w-16 h-16 mb-4" />
+                        <p>Henüz oy kullanılmadı.</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Öğrenci Ekranı */}
+          {role === 'student' && (
+            <div className="col-span-12 max-w-2xl mx-auto w-full space-y-8 animate-in fade-in duration-700">
+              <div className="text-center space-y-4 py-10">
+                <div className="text-slate-500 text-xs font-bold uppercase tracking-[0.3em]">Şu An Tahtada</div>
+                <div className="text-5xl font-black text-white italic tracking-tighter shadow-text uppercase">
+                  {currentLobby?.currentStudent || "Öğretmen Bekleniyor..."}
+                </div>
+              </div>
+
+              {currentLobby?.currentStudent ? (
+                <div className="bg-white/5 backdrop-blur-2xl border border-white/10 p-10 rounded-[3rem] shadow-2xl relative overflow-hidden">
+                  {myVote !== null ? (
+                    <div className="text-center py-12 space-y-4">
+                      <div className="w-20 h-20 bg-emerald-500/20 text-emerald-400 rounded-full mx-auto flex items-center justify-center">
+                        <UserCheck className="w-10 h-10" />
+                      </div>
+                      <h3 className="text-2xl font-bold">Puanın Verildi!</h3>
+                      <div className="text-5xl font-black text-amber-400 italic">{myVote}</div>
+                      <p className="text-slate-500 text-sm font-medium">Bir sonraki öğrenciyi bekleyin.</p>
+                    </div>
+                  ) : (
+                    <>
+                      <h3 className="text-center font-bold text-slate-400 mb-8 uppercase tracking-widest text-sm">Performansı Puanla</h3>
+                      <div className="grid grid-cols-5 gap-3">
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
+                          <button 
+                            key={num}
+                            onClick={() => submitVote(num * 10)}
+                            className="aspect-square bg-white/5 hover:bg-amber-400 hover:text-indigo-950 border border-white/10 rounded-2xl font-black text-xl transition-all active:scale-90"
+                          >
+                            {num * 10}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="mt-8 flex items-center justify-center gap-2 text-xs text-slate-500">
+                        <Shield className="w-3 h-3" /> Puanın sadece öğretmene gider
+                      </div>
+                    </>
+                  )}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-20 text-slate-600">
+                  <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4" />
+                  <p className="font-medium">Lobi aktif, sunumun başlaması bekleniyor...</p>
+                </div>
+              )}
             </div>
+          )}
 
-            <!-- Sağ Panel: Liste -->
-            <div class="lg:col-span-8 animate-slide" style="animation-delay: 0.2s">
-                <div class="glass rounded-[2rem] overflow-hidden flex flex-col h-full border-white/5">
-                    <div class="p-8 border-b border-white/5 flex items-center justify-between bg-white/5">
-                        <h2 class="text-xl font-bold">Öğrenci Not Listesi</h2>
-                        <div id="privacyStatus" class="hidden px-4 py-1.5 bg-yellow-400/10 border border-yellow-400/30 rounded-full text-yellow-400 text-[10px] font-bold tracking-widest animate-pulse">
-                            GİZLİLİK MODU AKTİF
-                        </div>
-                    </div>
-
-                    <div class="flex-grow overflow-auto min-h-[500px] relative">
-                        <table class="w-full text-left">
-                            <thead class="text-[10px] uppercase tracking-[0.2em] text-purple-400/80 sticky top-0 bg-indigo-950/50 backdrop-blur-md z-10">
-                                <tr>
-                                    <th class="px-8 py-5">AD SOYAD</th>
-                                    <th class="px-8 py-5">KATEGORİ</th>
-                                    <th class="px-8 py-5 text-center">SKOR</th>
-                                    <th class="px-8 py-5 text-right">İŞLEM</th>
-                                </tr>
-                            </thead>
-                            <tbody id="scoreTableBody" class="divide-y divide-white/5 transition-all duration-700">
-                                <!-- Dinamik Veri -->
-                            </tbody>
-                        </table>
-
-                        <div id="noData" class="absolute inset-0 flex flex-col items-center justify-center p-20 text-center pointer-events-none">
-                            <div class="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center mb-6 border border-white/10">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-purple-400/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                                </svg>
-                            </div>
-                            <h3 class="text-lg font-medium text-white/40">Henüz Kayıt Yok</h3>
-                            <p class="text-sm text-white/20">Eklediğiniz notlar burada listelenecektir.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
+      </div>
+
+      {/* Ayarlar Modalı */}
+      {isSettingsOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-md">
+          <div className="bg-[#1e1b4b] border border-white/10 p-10 rounded-[3rem] w-full max-w-md shadow-2xl">
+            <h3 className="text-xl font-bold mb-6 flex items-center gap-3"><Settings className="w-6 h-6 text-amber-400" /> Google Sheets Entegrasyonu</h3>
+            <input 
+              type="text" 
+              placeholder="Web App URL" 
+              className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-2xl outline-none focus:border-amber-400 mb-6 text-sm text-indigo-200"
+              value={sheetUrl}
+              onChange={(e) => setSheetUrl(e.target.value)}
+            />
+            <div className="flex gap-4">
+              <button onClick={() => setIsSettingsOpen(false)} className="flex-1 py-4 bg-white/5 rounded-2xl font-bold">Vazgeç</button>
+              <button onClick={() => { localStorage.setItem('gs_url', sheetUrl); setIsSettingsOpen(false); showToast("URL Kaydedildi!"); }} className="flex-1 py-4 bg-amber-400 text-indigo-950 rounded-2xl font-bold">Kaydet</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast Notification */}
+      <div className={`fixed bottom-10 left-1/2 -translate-x-1/2 px-8 py-4 bg-indigo-600 border border-indigo-400 rounded-2xl text-white font-bold shadow-2xl transition-all duration-500 z-[100] ${toast.show ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}>
+        {toast.msg}
+      </div>
+
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        .shadow-text { text-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+      `}</style>
     </div>
+  );
+};
 
-    <!-- Bildirim -->
-    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 glass px-8 py-4 rounded-2xl border-yellow-400/50 translate-y-32 opacity-0 transition-all duration-500 z-50 flex items-center gap-3">
-        <div class="w-2 h-2 bg-yellow-400 rounded-full animate-ping"></div>
-        <p class="text-sm font-semibold text-yellow-400" id="toastText">İşlem Başarılı</p>
-    </div>
-
-    <script>
-        // Veri Deposu
-        let studentRecords = [];
-        
-        // Element Seçiciler
-        const scoreForm = document.getElementById('scoreForm');
-        const scoreTableBody = document.getElementById('scoreTableBody');
-        const noData = document.getElementById('noData');
-        const studentCount = document.getElementById('studentCount');
-        const privacyToggle = document.getElementById('privacyToggle');
-        const privacyStatus = document.getElementById('privacyStatus');
-        const exportExcel = document.getElementById('exportExcel');
-        const toast = document.getElementById('toast');
-
-        // Kayıt Ekleme
-        scoreForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const name = document.getElementById('nameInput').value;
-            const category = document.getElementById('categoryInput').value;
-            const score = document.getElementById('scoreInput').value;
-
-            const newRecord = {
-                id: Date.now(),
-                name: name,
-                category: category,
-                score: parseInt(score),
-                time: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
-            };
-
-            studentRecords.unshift(newRecord); // Yeni kaydı başa ekle
-            updateUI();
-            scoreForm.reset();
-            document.getElementById('nameInput').focus();
-            showToast(`${name} listeye eklendi.`);
-        });
-
-        // UI Güncelleme
-        function updateUI() {
-            if (studentRecords.length > 0) {
-                noData.style.display = 'none';
-                renderTable();
-            } else {
-                noData.style.display = 'flex';
-                scoreTableBody.innerHTML = '';
-            }
-            studentCount.innerText = studentRecords.length;
-        }
-
-        // Tabloyu Oluştur
-        function renderTable() {
-            scoreTableBody.innerHTML = studentRecords.map(item => `
-                <tr class="group hover:bg-white/[0.03] transition-all duration-300">
-                    <td class="px-8 py-6">
-                        <div class="font-bold text-white text-lg">${item.name}</div>
-                        <div class="text-[10px] text-purple-400/50 tracking-widest uppercase mt-1">${item.time} kaydedildi</div>
-                    </td>
-                    <td class="px-8 py-6">
-                        <span class="text-[11px] font-bold px-3 py-1.5 rounded-lg bg-yellow-400/10 text-yellow-400 border border-yellow-400/20">
-                            ${item.category}
-                        </span>
-                    </td>
-                    <td class="px-8 py-6 text-center">
-                        <div class="text-2xl font-black ${item.score >= 50 ? 'text-white' : 'text-rose-500'}">
-                            ${item.score}
-                        </div>
-                    </td>
-                    <td class="px-8 py-6 text-right">
-                        <button onclick="removeRecord(${item.id})" class="opacity-0 group-hover:opacity-100 p-3 text-white/20 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        // Kayıt Silme
-        window.removeRecord = (id) => {
-            studentRecords = studentRecords.filter(r => r.id !== id);
-            updateUI();
-            showToast("Kayıt silindi.");
-        };
-
-        // Gizlilik Modu Kontrolü
-        privacyToggle.addEventListener('change', (e) => {
-            if (e.target.checked) {
-                scoreTableBody.classList.add('privacy-active');
-                privacyStatus.classList.remove('hidden');
-                showToast("Gizlilik modu aktif.");
-            } else {
-                scoreTableBody.classList.remove('privacy-active');
-                privacyStatus.classList.add('hidden');
-                showToast("Gizlilik modu kapalı.");
-            }
-        });
-
-        // Excel / CSV Aktarımı
-        exportExcel.addEventListener('click', () => {
-            if (studentRecords.length === 0) {
-                showToast("Aktarılacak veri yok!");
-                return;
-            }
-
-            // UTF-8 BOM ekleyerek Excel'in Türkçe karakterleri tanımasını sağlıyoruz
-            let csvContent = "\uFEFF"; 
-            csvContent += "Öğrenci Ad Soyad;Değerlendirme;Puan;Kayıt Saati\n";
-
-            studentRecords.forEach(r => {
-                csvContent += `${r.name};${r.category};${r.score};${r.time}\n`;
-            });
-
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            
-            const dateStr = new Date().toLocaleDateString('tr-TR').replace(/\./g, '-');
-            link.setAttribute("href", url);
-            link.setAttribute("download", `Sinif_Degerlendirme_Raporu_${dateStr}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            showToast("Excel raporu indirildi.");
-        });
-
-        // Toast Mesajı Göster
-        function showToast(text) {
-            document.getElementById('toastText').innerText = text;
-            toast.classList.remove('translate-y-32', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('translate-y-32', 'opacity-0');
-            }, 3000);
-        }
-    </script>
-</body>
-</html>
+export default App;
