@@ -191,7 +191,7 @@
                     <div class="glass rounded-[2rem] flex flex-col min-h-[400px]">
                         <div class="p-6 border-b border-white/5 flex justify-between items-center bg-white/5">
                             <h3 class="font-bold text-sm italic text-white uppercase tracking-tighter">Oylama Detayı</h3>
-                            <span id="voteCount" class="text-yellow-400 font-bold text-xs bg-yellow-400/10 px-2 py-1 rounded">0 OY</span>
+                            <span id="voteCountHeader" class="text-yellow-400 font-bold text-xs bg-yellow-400/10 px-2 py-1 rounded">0 OY</span>
                         </div>
                         <div id="votesGrid" class="p-6 space-y-3 overflow-auto custom-scrollbar"></div>
                     </div>
@@ -199,24 +199,24 @@
                         <div class="p-6 border-b border-white/5 bg-indigo-500/10 flex justify-between items-center text-white">
                             <h3 class="font-bold text-sm uppercase tracking-tighter italic">Sunum Geçmişi</h3>
                         </div>
-                        <div id="historyList" class="p-4 space-y-3 overflow-auto custom-scrollbar flex-grow"></div>
+                        <div id="historyList" class="p-4 space-y-3 overflow-auto custom-scrollbar flex-grow text-white"></div>
                     </div>
                 </div>
 
                 <!-- Öğrenci Puanlama Ekranı -->
-                <div id="studentVoteView" class="w-full max-w-2xl mx-auto hidden-view space-y-6 md:space-y-12 py-4 px-2">
+                <div id="studentVoteView" class="w-full max-w-2xl mx-auto hidden-view space-y-6 md:space-y-12 py-4 px-2 text-white">
                     <div class="text-center space-y-2">
                         <p class="text-[10px] font-bold text-indigo-400 uppercase tracking-[0.3em]">Sunum Değerlendiriliyor</p>
                         <h2 id="currentStudentDisplay" class="text-4xl md:text-6xl font-black italic uppercase tracking-tighter text-white drop-shadow-2xl">...</h2>
                     </div>
                     <div id="voteButtons" class="glass p-6 md:p-10 rounded-[2rem] md:rounded-[3.5rem] shadow-2xl">
                         <div class="grid grid-cols-4 sm:grid-cols-7 gap-2 md:gap-3" id="scoreGrid"></div>
-                        <p class="text-center text-[10px] text-slate-500 mt-6 uppercase font-bold tracking-widest opacity-50 italic text-white">Puanlar sadece öğretmene iletilir</p>
+                        <p class="text-center text-[10px] text-slate-500 mt-6 uppercase font-bold tracking-widest opacity-50 italic">Puanlar sadece öğretmene iletilir</p>
                     </div>
-                    <div id="voteSuccess" class="glass p-10 rounded-[2rem] text-center hidden-view animate-in zoom-in text-emerald-400 text-white">
+                    <div id="voteSuccess" class="glass p-10 rounded-[2rem] text-center hidden-view animate-in zoom-in text-emerald-400">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mx-auto mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                         <h3 class="text-xl md:text-3xl font-black text-white italic">Puanın İletildi!</h3>
-                        <p class="text-slate-500 text-xs mt-2">Bir sonraki sunumu bekleyin.</p>
+                        <p class="text-slate-500 text-xs mt-2 text-slate-300">Bir sonraki sunumu bekleyin.</p>
                     </div>
                 </div>
             </div>
@@ -230,11 +230,11 @@
                 <h1 class="text-4xl font-black italic uppercase tracking-tight">Oturum Raporu</h1>
                 <p class="text-purple-300/60 uppercase tracking-[0.3em] text-[10px] mt-1">Sınıf Performans Analizi</p>
             </div>
-            <button onclick="location.reload()" class="bg-white/5 border border-white/10 px-6 py-3 rounded-xl hover:bg-white/10 transition-all font-bold text-xs uppercase">Yeni Ders</button>
+            <button onclick="location.reload()" class="bg-white/5 border border-white/10 px-6 py-3 rounded-xl hover:bg-white/10 transition-all font-bold text-xs uppercase text-white">Yeni Ders</button>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            <div class="glass p-8 rounded-[2.5rem] text-center border-b-4 border-blue-400">
+            <div class="glass p-8 rounded-[2.5rem] text-center border-b-4 border-blue-400 text-white">
                 <p class="text-[10px] font-black uppercase text-slate-400 mb-2">Aritmetik Ortalama</p>
                 <div id="finalTotalAvg" class="text-6xl font-black text-white italic">0.0</div>
             </div>
@@ -245,34 +245,34 @@
             </div>
             <div class="glass p-8 rounded-[2.5rem] text-center border-b-4 border-rose-400">
                 <p class="text-[10px] font-black uppercase text-rose-400 mb-2">Min Performans</p>
-                <div id="finalMinName" class="text-lg font-bold text-white uppercase truncate mb-1">---</div>
+                <div id="finalMinName" class="text-lg font-bold text-white uppercase truncate mb-1 text-white">---</div>
                 <div id="finalMinScore" class="text-4xl font-black text-rose-400 italic">0.0</div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 text-white">
             <div class="glass rounded-[3rem] overflow-hidden flex flex-col h-[500px]">
                 <div class="p-8 border-b border-white/5 bg-indigo-500/10"><h3 class="font-black italic uppercase text-sm">Başarı Sıralaması</h3></div>
                 <div id="finalLeaderboard" class="p-6 space-y-4 overflow-auto custom-scrollbar flex-grow"></div>
             </div>
 
-            <div class="glass rounded-[3rem] p-10 flex flex-col items-center justify-center space-y-8 text-center">
+            <div class="glass rounded-[3rem] p-10 flex flex-col items-center justify-center space-y-8 text-center text-white">
                 <h3 class="font-black italic uppercase text-sm">Puanlama Davranışı (Cinsiyet)</h3>
                 <div class="flex flex-col md:flex-row items-center gap-10">
                     <div class="chart-circle" id="genderChart">
                         <div class="w-[120px] h-[120px] bg-[#1e1b4b] rounded-full glass border-none flex flex-col items-center justify-center">
                             <span class="text-[10px] font-black text-slate-400 uppercase">Toplam</span>
-                            <span class="text-2xl font-black" id="totalVotesText">0</span>
+                            <span class="text-2xl font-black text-white" id="totalVotesText">0</span>
                         </div>
                     </div>
                     <div class="space-y-4 text-left">
                         <div class="flex items-center gap-3">
                             <div class="w-3 h-3 rounded bg-blue-500"></div>
-                            <div><p class="text-[9px] font-black uppercase text-slate-500">Erkek Ort.</p><p class="text-xl font-black" id="maleAvgText">0.0</p></div>
+                            <div><p class="text-[9px] font-black uppercase text-slate-500">Erkek Ort.</p><p class="text-xl font-black text-white" id="maleAvgText">0.0</p></div>
                         </div>
                         <div class="flex items-center gap-3">
                             <div class="w-3 h-3 rounded bg-pink-500"></div>
-                            <div><p class="text-[9px] font-black uppercase text-slate-500">Kadın Ort.</p><p class="text-xl font-black" id="femaleAvgText">0.0</p></div>
+                            <div><p class="text-[9px] font-black uppercase text-slate-500">Kadın Ort.</p><p class="text-xl font-black text-white" id="femaleAvgText">0.0</p></div>
                         </div>
                     </div>
                 </div>
@@ -287,6 +287,7 @@
     </div>
 
     <script>
+        // --- Yapılandırmalar ---
         const firebaseConfig = {
             apiKey: "AIzaSyDF1juJ_HX3GQ3tYop9cUsSPuZ70-cID1s",
             authDomain: "gradelobby-64c60.firebaseapp.com",
@@ -298,7 +299,8 @@
         };
 
         const AUTO_SHEETS_URL = "https://script.google.com/macros/s/AKfycbwQiJWSFC45CIXjxzOVufPc4FEv4T1oFOdyea1qTUd2npgDnFq9ZNUXFhSNzlt4f3Y/exec";
-        const appId = "gradelobby-v4-selection"; 
+        // AppId Kural 1'e göre güncellendi
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'gradelobby-v5-final'; 
         
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
@@ -309,17 +311,21 @@
         let currentAvg = "0.0", lastHistory = [], sessionAllVotes = [], participants = [];
         let selectedGender = 'male', isLobbyAnon = false;
 
-        const getLobbyPath = (code) => `artifacts/${appId}/public/data/lobbies/${code}`;
-        const getParticipantsCol = (code) => db.collection(`artifacts/${appId}/public/data/lobbies/${code}/participants`);
-        const getVotesCollection = () => db.collection(`artifacts/${appId}/public/data/votes`);
-        const getHistoryCollection = () => db.collection(`artifacts/${appId}/public/data/history`);
+        // Kural 1: Koleksiyon Yolları
+        const getLobbyDoc = (code) => db.doc(`artifacts/${appId}/public/data/lobbies/${code}`);
+        const getParticipantsCol = () => db.collection(`artifacts/${appId}/public/data/participants`);
+        const getVotesCol = () => db.collection(`artifacts/${appId}/public/data/votes`);
+        const getHistoryCol = () => db.collection(`artifacts/${appId}/public/data/history`);
 
         async function initAuth() {
             try {
                 const cred = await auth.signInAnonymously();
                 currentUser = cred.user;
                 return true;
-            } catch (err) { showToast("Bağlantı Hatası!"); return false; }
+            } catch (err) { 
+                showToast("Auth Hatası!"); 
+                return false; 
+            }
         }
         initAuth();
 
@@ -330,43 +336,70 @@
         }
 
         async function selectRole(role) {
-            if (!currentUser) await initAuth();
+            const ok = await initAuth();
+            if (!ok) return;
             currentRole = role;
             document.getElementById('roleView').classList.add('hidden-view');
             if (role === 'teacher') createLobby();
-            else document.getElementById('studentJoinView').classList.remove('hidden-view');
+            else {
+                document.getElementById('studentJoinView').classList.remove('hidden-view');
+                setGender('male');
+            }
         }
 
         async function createLobby() {
-            const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-            currentLobbyCode = code;
-            await db.doc(getLobbyPath(code)).set({ code, teacherId: currentUser.uid, currentStudent: '', isAnonymous: false, createdAt: Date.now() });
-            setupUI('teacher');
-            startLobbyListeners(code);
+            if (!currentUser) return;
+            try {
+                const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+                currentLobbyCode = code;
+                
+                // Kural 1: Düz yol kullanımı
+                await getLobbyDoc(code).set({ 
+                    code, 
+                    teacherId: currentUser.uid, 
+                    currentStudent: '', 
+                    isAnonymous: false, 
+                    createdAt: Date.now() 
+                });
+                
+                setupUI('teacher');
+                startLobbyListeners(code);
+                showToast("Lobi kuruldu!");
+            } catch (e) {
+                console.error(e);
+                showToast("Erişim hatası: Kuralları kontrol edin.");
+            }
         }
 
         async function joinLobby() {
+            if (!currentUser) await initAuth();
             const code = document.getElementById('lobbyCodeInput').value.trim().toUpperCase();
             const name = document.getElementById('studentNameInput').value.trim();
-            if (code.length < 4 || name.length < 2) return showToast("Bilgileri kontrol edin!");
             
-            const doc = await db.doc(getLobbyPath(code)).get();
-            if (!doc.exists) return showToast("Oda bulunamadı!");
+            if (code.length < 4 || name.length < 2) return showToast("Bilgileri doldurun!");
             
-            currentLobbyCode = code;
-            currentUser.customName = name;
-            currentUser.customGender = selectedGender;
-            
-            // Register as participant
-            await getParticipantsCol(code).doc(currentUser.uid).set({
-                uid: currentUser.uid,
-                name: name,
-                gender: selectedGender,
-                joinedAt: Date.now()
-            });
+            try {
+                const doc = await getLobbyDoc(code).get();
+                if (!doc.exists) return showToast("Oda bulunamadı!");
+                
+                currentLobbyCode = code;
+                currentUser.customName = name;
+                currentUser.customGender = selectedGender;
+                
+                // Katılımcıyı kaydet
+                await getParticipantsCol().doc(currentUser.uid).set({
+                    uid: currentUser.uid,
+                    lobbyId: code,
+                    name: name,
+                    gender: selectedGender,
+                    joinedAt: Date.now()
+                });
 
-            setupUI('student');
-            startLobbyListeners(code);
+                setupUI('student');
+                startLobbyListeners(code);
+            } catch (e) {
+                showToast("Erişim reddedildi.");
+            }
         }
 
         function setupUI(role) {
@@ -374,6 +407,7 @@
             document.getElementById('mainDashboard').classList.remove('hidden-view');
             document.getElementById('displayCode').innerText = currentLobbyCode;
             document.getElementById('roleBadge').innerText = role === 'teacher' ? 'YÖNETİCİ' : currentUser.customName.toUpperCase();
+            
             if (role === 'teacher') {
                 document.getElementById('teacherStats').classList.remove('hidden-view');
                 document.getElementById('teacherControls').classList.remove('hidden-view');
@@ -385,26 +419,30 @@
         }
 
         function startLobbyListeners(code) {
-            lobbySub = db.doc(getLobbyPath(code)).onSnapshot(doc => {
+            lobbySub = getLobbyDoc(code).onSnapshot(doc => {
                 const data = doc.data(); if (!data) return;
                 isLobbyAnon = data.isAnonymous;
                 if (currentRole === 'teacher') document.getElementById('anonToggle').checked = data.isAnonymous;
-                if (data.currentStudent !== activeStudent) { activeStudent = data.currentStudent; handleLobbyStateChange(); }
+                if (data.currentStudent !== activeStudent) { 
+                    activeStudent = data.currentStudent; 
+                    handleLobbyStateChange(); 
+                }
             });
 
+            // Kural 2: Bellekte filtreleme
             if (currentRole === 'teacher') {
-                participantsSub = getParticipantsCol(code).onSnapshot(snap => {
-                    participants = snap.docs.map(d => d.data());
+                participantsSub = getParticipantsCol().onSnapshot(snap => {
+                    participants = snap.docs.map(d => d.data()).filter(p => p.lobbyId === code);
                     renderParticipantList();
                 });
 
-                votesSub = getVotesCollection().onSnapshot(snap => {
+                votesSub = getVotesCol().onSnapshot(snap => {
                     sessionAllVotes = snap.docs.map(d => d.data()).filter(v => v.lobbyId === code);
                     const activeVotes = sessionAllVotes.filter(v => v.studentName === activeStudent);
                     updateTeacherStats(activeVotes);
                 });
 
-                historySub = getHistoryCollection().onSnapshot(snap => {
+                historySub = getHistoryCol().onSnapshot(snap => {
                     lastHistory = snap.docs.map(d => d.data()).filter(h => h.lobbyId === code).sort((a, b) => b.timestamp - a.timestamp);
                     renderHistory(lastHistory);
                     renderParticipantList();
@@ -425,16 +463,17 @@
 
             list.innerHTML = participants.map(p => {
                 const isUsed = usedNames.includes(p.name);
+                const isCurrent = activeStudent === p.name;
                 const genderIcon = p.gender === 'male' ? '♂' : '♀';
                 const genderClass = p.gender === 'male' ? 'text-blue-400' : 'text-pink-400';
                 
                 return `
-                    <div onclick="selectStudent('${p.name}')" class="student-item glass p-3 rounded-xl flex items-center justify-between cursor-pointer ${isUsed ? 'used' : ''}">
+                    <div onclick="selectStudent('${p.name}')" class="student-item glass p-3 rounded-xl flex items-center justify-between cursor-pointer ${isUsed ? 'used' : ''} ${isCurrent ? 'border-yellow-400/50 bg-white/5' : 'border-white/5'}">
                         <div class="flex items-center gap-3">
                             <span class="${genderClass} font-black">${genderIcon}</span>
-                            <span class="text-xs font-bold truncate">${p.name}</span>
+                            <span class="text-xs font-bold truncate text-white">${p.name}</span>
                         </div>
-                        ${isUsed ? '<span class="text-[8px] bg-white/10 px-1.5 py-0.5 rounded text-white font-black">PUANLANDI</span>' : '<span class="text-[8px] text-yellow-400 font-black">SIRADA</span>'}
+                        ${isUsed ? '<span class="text-[8px] bg-white/10 px-1.5 py-0.5 rounded text-white font-black opacity-50">TAMAM</span>' : (isCurrent ? '<span class="text-[8px] bg-yellow-400 text-indigo-950 px-1.5 py-0.5 rounded font-black">YAYINDA</span>' : '<span class="text-[8px] text-yellow-400 font-black">SIRADA</span>')}
                     </div>
                 `;
             }).join('');
@@ -442,18 +481,15 @@
 
         async function pickRandomStudent() {
             const usedNames = lastHistory.map(h => h.studentName);
-            const available = participants.filter(p => !usedNames.includes(p.name));
-            
-            if (available.length === 0) return showToast("Sıradaki öğrenci kalmadı!");
-            
+            const available = participants.filter(p => !usedNames.includes(p.name) && p.name !== activeStudent);
+            if (available.length === 0) return showToast("Bekleyen kimse yok!");
             const random = available[Math.floor(Math.random() * available.length)];
             selectStudent(random.name);
-            showToast(`Şanslı kişi: ${random.name}!`);
         }
 
         async function selectStudent(name) {
             if (lastHistory.some(h => h.studentName === name)) return;
-            await db.doc(getLobbyPath(currentLobbyCode)).update({ currentStudent: name });
+            await getLobbyDoc(currentLobbyCode).update({ currentStudent: name });
         }
 
         function handleLobbyStateChange() {
@@ -465,6 +501,7 @@
                     finishSec.classList.remove('hidden-view'); startSec.classList.add('hidden-view');
                 } else {
                     finishSec.classList.add('hidden-view'); startSec.classList.remove('hidden-view');
+                    document.getElementById('avgDisplay').innerText = "0.0";
                 }
             } else {
                 document.getElementById('currentStudentDisplay').innerText = activeStudent || "BEKLENİYOR...";
@@ -474,29 +511,43 @@
         }
 
         async function finishScoring() {
-            if (!activeStudent || currentAvg === "0.0") return showToast("Önce puanlama yapılmalı!");
-            await getHistoryCollection().add({ lobbyId: currentLobbyCode, studentName: activeStudent, score: currentAvg, timestamp: Date.now() });
-            await db.doc(getLobbyPath(currentLobbyCode)).update({ currentStudent: "" });
-            showToast(`${activeStudent} kaydedildi.`);
+            if (!activeStudent || currentAvg === "0.0") return showToast("Henüz puan gelmedi!");
+            try {
+                await getHistoryCol().add({ lobbyId: currentLobbyCode, studentName: activeStudent, score: currentAvg, timestamp: Date.now() });
+                await getLobbyDoc(currentLobbyCode).update({ currentStudent: "" });
+            } catch (e) { showToast("Kayıt hatası."); }
         }
 
         async function submitVote(score) {
             if (!activeStudent) return;
-            await getVotesCollection().add({ lobbyId: currentLobbyCode, voterName: currentUser.customName, voterGender: currentUser.customGender, studentName: activeStudent, score, timestamp: Date.now() });
-            document.getElementById('voteButtons').classList.add('hidden-view');
-            document.getElementById('voteSuccess').classList.remove('hidden-view');
+            try {
+                await getVotesCol().add({ 
+                    lobbyId: currentLobbyCode, 
+                    voterName: currentUser.customName, 
+                    voterGender: currentUser.customGender, 
+                    studentName: activeStudent, 
+                    score, 
+                    timestamp: Date.now() 
+                });
+                document.getElementById('voteButtons').classList.add('hidden-view');
+                document.getElementById('voteSuccess').classList.remove('hidden-view');
+            } catch (e) { showToast("İletim hatası."); }
         }
 
         function updateTeacherStats(votes) {
             const grid = document.getElementById('votesGrid'), avgEl = document.getElementById('avgDisplay');
-            document.getElementById('voteCount').innerText = votes.length + " OY";
+            document.getElementById('voteCountHeader').innerText = votes.length + " OY";
             grid.innerHTML = votes.map(v => {
                 const icon = isLobbyAnon ? '👤' : (v.voterGender === 'male' ? '♂' : '♀');
                 const name = isLobbyAnon ? 'Gizli' : v.voterName;
-                return `<div class="glass p-3 rounded-xl flex items-center justify-between"><div class="flex gap-2"><span class="${v.voterGender === 'male' ? 'text-blue-400' : 'text-pink-400'}">${icon}</span><span class="text-xs font-bold truncate max-w-[100px] text-white">${name}</span></div><span class="text-xl font-black text-yellow-400">${v.score}</span></div>`;
+                return `<div class="glass p-3 rounded-xl flex items-center justify-between"><div class="flex gap-2"><span class="${v.voterGender === 'male' ? 'text-blue-400' : 'text-pink-400'}">${icon}</span><span class="text-xs font-bold truncate max-w-[100px] text-white">${name}</span></div><span class="text-xl font-black text-yellow-400 italic">${v.score}</span></div>`;
             }).join('');
-            if (votes.length > 0) { currentAvg = (votes.reduce((a, b) => a + b.score, 0) / votes.length).toFixed(1); avgEl.innerText = currentAvg; }
-            else { currentAvg = "0.0"; avgEl.innerText = "0.0"; }
+            if (votes.length > 0) { 
+                currentAvg = (votes.reduce((a, b) => a + b.score, 0) / votes.length).toFixed(1); 
+                avgEl.innerText = currentAvg; 
+            } else { 
+                currentAvg = "0.0"; avgEl.innerText = "0.0"; 
+            }
             renderHistory(lastHistory);
         }
 
@@ -504,19 +555,19 @@
             const container = document.getElementById('historyList');
             let html = "";
             if (activeStudent && currentAvg !== "0.0") {
-                html += `<div class="glass p-4 rounded-xl flex items-center justify-between border-yellow-400/30 live-card"><div class="flex flex-col"><span class="text-[8px] text-yellow-400 font-bold uppercase tracking-widest animate-pulse">CANLI PUANLAMA</span><span class="text-base font-bold uppercase italic text-white">${activeStudent}</span></div><div class="bg-yellow-400 text-indigo-950 px-3 py-1 rounded-lg font-black text-lg">${currentAvg}</div></div>`;
+                html += `<div class="glass p-4 rounded-xl flex items-center justify-between border-yellow-400/30 live-card text-white"><div class="flex flex-col"><span class="text-[8px] text-yellow-400 font-bold uppercase tracking-widest animate-pulse">CANLI</span><span class="text-base font-bold uppercase italic text-white">${activeStudent}</span></div><div class="bg-yellow-400 text-indigo-950 px-3 py-1 rounded-lg font-black text-lg">${currentAvg}</div></div>`;
             }
-            if (historyData.length === 0 && !activeStudent) { container.innerHTML = `<div class="text-center opacity-20 py-10 italic">Veri yok.</div>`; return; }
-            html += historyData.map(h => `<div class="glass p-4 rounded-xl flex items-center justify-between border-white/5 opacity-80"><div class="flex flex-col"><span class="text-[8px] text-emerald-400 font-bold uppercase">BİTTİ</span><span class="text-base font-bold uppercase italic truncate max-w-[150px] text-white">${h.studentName}</span></div><div class="bg-white/10 px-3 py-1 rounded-lg font-black text-lg text-white">${h.score}</div></div>`).join('');
+            if (historyData.length === 0 && !activeStudent) { container.innerHTML = `<div class="text-center opacity-20 py-10 italic">Henüz sunum yok.</div>`; return; }
+            html += historyData.map(h => `<div class="glass p-4 rounded-xl flex items-center justify-between border-white/5 opacity-80 text-white"><div class="flex flex-col"><span class="text-[8px] text-emerald-400 font-bold uppercase">BİTTİ</span><span class="text-base font-bold uppercase italic truncate max-w-[150px] text-white">${h.studentName}</span></div><div class="bg-white/10 px-3 py-1 rounded-lg font-black text-lg text-white border border-white/5">${h.score}</div></div>`).join('');
             container.innerHTML = html;
         }
 
         function renderScoreButtons() {
-            document.getElementById('scoreGrid').innerHTML = Array.from({length: 21}, (_, i) => i).map(n => `<button onclick="submitVote(${n})" class="vote-btn aspect-square glass rounded-xl font-black text-white bg-white/10">${n}</button>`).join('');
+            document.getElementById('scoreGrid').innerHTML = Array.from({length: 21}, (_, i) => i).map(n => `<button onclick="submitVote(${n})" class="vote-btn aspect-square glass rounded-xl font-black text-white bg-white/10 hover:bg-yellow-400 hover:text-indigo-950 transition-all">${n}</button>`).join('');
         }
 
         function showFinalReport() {
-            if (lastHistory.length === 0) return showToast("Henüz tamamlanmış sunum yok!");
+            if (lastHistory.length === 0) return showToast("Sunum yapılmadı!");
             document.getElementById('mainDashboard').classList.add('hidden-view');
             document.getElementById('finalReportView').classList.remove('hidden-view');
             const totalMean = (lastHistory.reduce((a, b) => a + parseFloat(b.score), 0) / lastHistory.length).toFixed(1);
@@ -526,7 +577,7 @@
             document.getElementById('finalMaxScore').innerText = sorted[0].score;
             document.getElementById('finalMinName').innerText = sorted[sorted.length-1].studentName;
             document.getElementById('finalMinScore').innerText = sorted[sorted.length-1].score;
-            document.getElementById('finalLeaderboard').innerHTML = sorted.map((h, i) => `<div class="glass p-5 rounded-2xl flex items-center justify-between border-white/5 text-white"><div class="flex items-center gap-4"><span class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center font-black text-xs">${i+1}</span><span class="font-bold uppercase italic">${h.studentName}</span></div><span class="text-2xl font-black text-yellow-400 italic">${h.score}</span></div>`).join('');
+            document.getElementById('finalLeaderboard').innerHTML = sorted.map((h, i) => `<div class="glass p-5 rounded-2xl flex items-center justify-between border-white/5 text-white"><div class="flex items-center gap-4"><span class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center font-black text-xs text-white">${i+1}</span><span class="font-bold uppercase italic text-white">${h.studentName}</span></div><span class="text-2xl font-black text-yellow-400 italic">${h.score}</span></div>`).join('');
             const maleVotes = sessionAllVotes.filter(v => v.voterGender === 'male'), femaleVotes = sessionAllVotes.filter(v => v.voterGender === 'female');
             document.getElementById('maleAvgText').innerText = maleVotes.length ? (maleVotes.reduce((a, b) => a+b.score, 0)/maleVotes.length).toFixed(1) : "0.0";
             document.getElementById('femaleAvgText').innerText = femaleVotes.length ? (femaleVotes.reduce((a, b) => a+b.score, 0)/femaleVotes.length).toFixed(1) : "0.0";
@@ -543,8 +594,9 @@
         }
 
         async function toggleAnonMode() {
+            if (!currentLobbyCode) return;
             const isAnon = document.getElementById('anonToggle').checked;
-            await db.doc(getLobbyPath(currentLobbyCode)).update({ isAnonymous: isAnon });
+            await getLobbyDoc(currentLobbyCode).update({ isAnonymous: isAnon });
         }
 
         function showToast(msg) {
