@@ -198,7 +198,9 @@
                                 <h3 class="font-bold text-sm italic text-white uppercase tracking-tighter text-white">Oylama Detayı</h3>
                                 <span id="voteCountHeader" class="text-yellow-400 font-bold text-xs text-white">0 OY</span>
                             </div>
-                            <div id="votesGrid" class="p-6 space-y-3 overflow-auto custom-scrollbar text-white"></div>
+                            <div id="votesGrid" class="p-6 space-y-3 overflow-auto custom-scrollbar text-white">
+                                <div id="noActiveScoreMsg" class="text-center opacity-20 py-20 italic text-sm text-white">Sıradaki öğrenci bekleniyor...</div>
+                            </div>
                         </div>
                         <div class="glass rounded-[2rem] flex flex-col min-h-[400px] text-white">
                             <div class="p-6 border-b border-white/5 bg-indigo-500/10 flex justify-between items-center text-white">
@@ -388,6 +390,12 @@
                 if (currentRole === 'teacher') {
                     document.getElementById('lessonStartBlock').classList.toggle('hidden-view', data.isLocked);
                     document.getElementById('nextStudentBlock').classList.toggle('hidden-view', !data.isLocked || activeStudent !== '');
+                    
+                    // Ders başladıktan sonra tablo görünürlüğü kalıcı olsun
+                    if (data.isLocked) {
+                        document.getElementById('waitingView').classList.add('hidden-view');
+                        document.getElementById('activePresentationView').classList.remove('hidden-view');
+                    }
                 } else {
                     document.getElementById('studentWaitMsg').innerText = data.isLocked ? "Ders başladı, seçim bekleniyor..." : "Herkesin gelmesi bekleniyor...";
                 }
@@ -459,17 +467,14 @@
 
         function handleLobbyStateChange() {
             const hasActive = activeStudent !== '';
-            document.getElementById('waitingView').classList.toggle('hidden-view', hasActive);
-            document.getElementById('activePresentationView').classList.toggle('hidden-view', !hasActive);
 
-            if (currentRole === 'teacher') {
-                document.getElementById('finishPresentationBlock').classList.toggle('hidden-view', !hasActive);
-                document.getElementById('nextStudentBlock').classList.toggle('hidden-view', hasActive || !isLobbyLocked);
-                document.getElementById('teacherActiveName').innerText = activeStudent;
-            } else {
+            // ÖĞRENCİ EKRANI İÇİN GÖRÜNÜRLÜK AYARI
+            if (currentRole === 'student') {
+                document.getElementById('waitingView').classList.toggle('hidden-view', hasActive);
+                document.getElementById('activePresentationView').classList.toggle('hidden-view', !hasActive);
+                
                 document.getElementById('currentStudentDisplay').innerText = activeStudent;
                 
-                // KENDİSİ SUNUM YAPIYORSA PUANLAMA PANELİNİ GİZLE, MESAJ GÖSTER
                 if (hasActive && activeStudent === currentUser.customName) {
                     document.getElementById('studentVotePanel').classList.add('hidden-view');
                     document.getElementById('studentStatusArea').classList.remove('hidden-view');
@@ -480,6 +485,17 @@
                     document.getElementById('voteButtons').classList.remove('hidden-view');
                     document.getElementById('voteSuccess').classList.add('hidden-view');
                 }
+            } else {
+                // ÖĞRETMEN EKRANI İÇİN GÖRÜNÜRLÜK AYARI
+                // Ders başladıysa (isLobbyLocked) waitingView asla görünmez, activePresentationView kalıcıdır.
+                if (isLobbyLocked) {
+                    document.getElementById('waitingView').classList.add('hidden-view');
+                    document.getElementById('activePresentationView').classList.remove('hidden-view');
+                }
+
+                document.getElementById('finishPresentationBlock').classList.toggle('hidden-view', !hasActive);
+                document.getElementById('nextStudentBlock').classList.toggle('hidden-view', hasActive || !isLobbyLocked);
+                document.getElementById('teacherActiveName').innerText = activeStudent;
             }
         }
 
@@ -492,13 +508,10 @@
 
         async function submitVote(score) {
             if (!activeStudent) return;
-            
-            // KENDİNE OY VERME KONTROLÜ (GÜVENLİK)
             if (activeStudent === currentUser.customName) {
                 showToast("Kendi sunumunuzu oylayamazsınız!");
                 return;
             }
-
             await getVotesCol().add({ 
                 lobbyId: currentLobbyCode, voterName: currentUser.customName, voterGender: currentUser.customGender, 
                 studentName: activeStudent, score, timestamp: Date.now() 
@@ -510,9 +523,16 @@
         function updateTeacherStats(votes) {
             const grid = document.getElementById('votesGrid'), avgEl = document.getElementById('avgDisplay');
             document.getElementById('voteCountHeader').innerText = votes.length + " OY";
-            grid.innerHTML = votes.map(v => `<div class="glass p-3 rounded-xl flex items-center justify-between border-white/5 animate-in slide-in-from-bottom-1 text-white"><div class="flex gap-2 text-white"><span class="${v.voterGender === 'male' ? 'text-blue-400' : 'text-pink-400'}">${v.voterGender === 'male' ? '♂' : '♀'}</span><span class="text-xs font-bold text-white">${v.voterName}</span></div><span class="text-xl font-black text-yellow-400 italic">${v.score}</span></div>`).join('');
-            if (votes.length > 0) { currentAvg = (votes.reduce((a, b) => a + b.score, 0) / votes.length).toFixed(1); avgEl.innerText = currentAvg; }
-            else { currentAvg = "0.0"; avgEl.innerText = "0.0"; }
+            
+            if (votes.length === 0) {
+                grid.innerHTML = `<div class="text-center opacity-20 py-20 italic text-sm text-white">Sıradaki öğrenci bekleniyor...</div>`;
+                currentAvg = "0.0";
+                avgEl.innerText = "0.0";
+            } else {
+                grid.innerHTML = votes.map(v => `<div class="glass p-3 rounded-xl flex items-center justify-between border-white/5 animate-in slide-in-from-bottom-1 text-white"><div class="flex gap-2 text-white"><span class="${v.voterGender === 'male' ? 'text-blue-400' : 'text-pink-400'}">${v.voterGender === 'male' ? '♂' : '♀'}</span><span class="text-xs font-bold text-white">${v.voterName}</span></div><span class="text-xl font-black text-yellow-400 italic">${v.score}</span></div>`).join('');
+                currentAvg = (votes.reduce((a, b) => a + b.score, 0) / votes.length).toFixed(1);
+                avgEl.innerText = currentAvg;
+            }
             renderHistory(lastHistory);
         }
 
@@ -523,7 +543,7 @@
                 html += `<div class="glass p-4 rounded-xl flex items-center justify-between border-yellow-400/30 live-card text-white"><div class="flex flex-col"><span class="text-[8px] text-yellow-400 font-bold uppercase animate-pulse">CANLI</span><span class="text-base font-bold uppercase italic text-white">${activeStudent}</span></div><div class="bg-yellow-400 text-indigo-950 px-3 py-1 rounded-lg font-black text-lg">${currentAvg}</div></div>`;
             }
             html += historyData.map(h => `<div class="glass p-4 rounded-xl flex items-center justify-between border-white/5 opacity-80 text-white"><div class="flex flex-col"><span class="text-[8px] text-emerald-400 font-bold uppercase">BİTTİ</span><span class="text-base font-bold uppercase italic truncate max-w-[150px] text-white">${h.studentName}</span></div><div class="bg-white/10 px-3 py-1 rounded-lg font-black text-lg text-white border border-white/5">${h.score}</div></div>`).join('');
-            container.innerHTML = html || `<div class="text-center opacity-20 py-10 italic">Henüz sunum yok.</div>`;
+            container.innerHTML = html || `<div class="text-center opacity-20 py-10 italic text-white">Henüz sunum yok.</div>`;
         }
 
         function renderScoreButtons() {
