@@ -77,14 +77,14 @@
             <p class="text-purple-300/60 font-semibold tracking-[0.2em] text-[10px] uppercase">Akıllı Seçim & Canlı Sunum</p>
         </div>
 
-        <div class="grid grid-cols-1 gap-4">
+        <div class="grid grid-cols-1 gap-4 text-white">
             <button onclick="selectRole('teacher')" class="glass p-8 md:p-10 rounded-[2rem] hover:bg-white/5 transition-all group flex flex-col items-center gap-4 active:scale-95 text-white">
                 <div class="bg-yellow-400 p-4 md:p-5 rounded-2xl text-indigo-950 shadow-xl shadow-yellow-400/20">
                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                 </div>
-                <div class="text-center">
-                    <span class="text-xl md:text-2xl font-black tracking-tight block uppercase">Öğretmen Paneli</span>
-                    <span class="text-[9px] text-slate-500 uppercase tracking-widest opacity-60">Dersi Yönet</span>
+                <div class="text-center text-white">
+                    <span class="text-xl md:text-2xl font-black tracking-tight block uppercase text-white">Öğretmen Paneli</span>
+                    <span class="text-[9px] text-slate-500 uppercase tracking-widest opacity-60 text-white">Dersi Yönet</span>
                 </div>
             </button>
 
@@ -92,9 +92,9 @@
                 <div class="bg-indigo-500 p-4 md:p-5 rounded-2xl text-white shadow-xl shadow-indigo-500/20">
                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20a6 6 0 0 0-12 0"/><circle cx="12" cy="10" r="4"/><circle cx="12" cy="12" r="10"/></svg>
                 </div>
-                <div class="text-center">
-                    <span class="text-xl md:text-2xl font-black tracking-tight block uppercase">Öğrenci Girişi</span>
-                    <span class="text-[9px] text-slate-500 uppercase tracking-widest opacity-60">Odaya Katıl</span>
+                <div class="text-center text-white">
+                    <span class="text-xl md:text-2xl font-black tracking-tight block uppercase text-white">Öğrenci Girişi</span>
+                    <span class="text-[9px] text-slate-500 uppercase tracking-widest opacity-60 text-white">Odaya Katıl</span>
                 </div>
             </button>
         </div>
@@ -102,17 +102,17 @@
 
     <!-- 2. ÖĞRENCİ KAYIT EKRANI -->
     <div id="studentJoinView" class="max-w-md mx-auto mt-10 md:mt-20 hidden-view animate-in slide-in-from-bottom-10 duration-500 px-2 text-white">
-        <div class="glass p-8 md:p-10 rounded-[2.5rem] space-y-6 relative overflow-hidden">
-            <h2 class="text-2xl font-black text-center italic tracking-tight uppercase">Bilgilerinizi Girin</h2>
+        <div class="glass p-8 md:p-10 rounded-[2.5rem] space-y-6 relative overflow-hidden text-white">
+            <h2 class="text-2xl font-black text-center italic tracking-tight uppercase text-white">Bilgilerinizi Girin</h2>
             <div class="space-y-4">
-                <input type="text" id="lobbyCodeInput" placeholder="ODA KODU" class="input-glass w-full px-5 py-3.5 rounded-xl text-center text-xl font-black tracking-[0.2em] uppercase">
-                <input type="text" id="studentNameInput" placeholder="Adınız Soyadınız" class="input-glass w-full px-5 py-3.5 rounded-xl font-bold text-base">
+                <input type="text" id="lobbyCodeInput" placeholder="ODA KODU" class="input-glass w-full px-5 py-3.5 rounded-xl text-center text-xl font-black tracking-[0.2em] uppercase text-white text-white">
+                <input type="text" id="studentNameInput" placeholder="Adınız Soyadınız" class="input-glass w-full px-5 py-3.5 rounded-xl font-bold text-base text-white text-white">
                 <div class="flex gap-4">
                     <button onclick="setGender('male')" id="maleBtn" class="gender-btn flex-1 bg-blue-500/20 py-3 rounded-xl flex flex-col items-center gap-1">
-                        <span class="text-2xl">♂</span><span class="text-[10px] font-bold uppercase text-white">Erkek</span>
+                        <span class="text-2xl text-white">♂</span><span class="text-[10px] font-bold uppercase text-white">Erkek</span>
                     </button>
                     <button onclick="setGender('female')" id="femaleBtn" class="gender-btn flex-1 bg-pink-500/20 py-3 rounded-xl flex flex-col items-center gap-1">
-                        <span class="text-2xl">♀</span><span class="text-[10px] font-bold uppercase text-white">Kadın</span>
+                        <span class="text-2xl text-white">♀</span><span class="text-[10px] font-bold uppercase text-white">Kadın</span>
                     </button>
                 </div>
                 <button onclick="joinLobby()" class="w-full bg-yellow-400 text-indigo-950 font-black py-4 rounded-xl shadow-2xl active:scale-95 transition-all uppercase">GİRİŞ YAP</button>
@@ -123,21 +123,21 @@
     <!-- 3. ANA DASHBOARD -->
     <div id="mainDashboard" class="max-w-[1400px] mx-auto hidden-view space-y-6 md:space-y-8 animate-in fade-in duration-1000">
         <header class="glass p-4 md:p-6 rounded-[1.5rem] md:rounded-[2rem] flex flex-col md:flex-row justify-between items-center gap-4 text-white">
-            <div class="flex items-center gap-4 md:gap-5 w-full md:w-auto">
-                <div id="displayCode" class="w-12 h-12 md:w-16 md:h-16 bg-yellow-400 text-indigo-900 rounded-xl md:rounded-2xl flex items-center justify-center font-black text-lg md:text-2xl shadow-lg">...</div>
+            <div class="flex items-center gap-4 md:gap-5 w-full md:w-auto text-white">
+                <div id="displayCode" class="w-12 h-12 md:w-16 md:h-16 bg-yellow-400 text-indigo-900 rounded-xl md:rounded-2xl flex items-center justify-center font-black text-lg md:text-2xl shadow-lg text-indigo-900">...</div>
                 <div>
-                    <h3 class="font-bold text-base md:text-xl tracking-tight text-white" id="statusHeader">Oturum Açık</h3>
-                    <p id="roleBadge" class="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-yellow-400/80">YÜKLENİYOR</p>
+                    <h3 class="font-bold text-base md:text-xl tracking-tight text-white text-white" id="statusHeader">Oturum Açık</h3>
+                    <p id="roleBadge" class="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-yellow-400/80 text-yellow-400">YÜKLENİYOR</p>
                 </div>
             </div>
 
             <div id="teacherStats" class="flex items-center justify-between md:justify-end gap-6 md:gap-10 hidden-view w-full md:w-auto border-t md:border-none border-white/5 pt-4 md:pt-0">
                 <div class="text-center">
                     <p class="text-[8px] md:text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-0.5 md:mb-1 text-white text-xs">Anlık Ortalama</p>
-                    <div id="avgDisplay" class="text-3xl md:text-5xl font-black text-yellow-400 italic leading-none tabular-nums">0.0</div>
+                    <div id="avgDisplay" class="text-3xl md:text-5xl font-black text-yellow-400 italic leading-none tabular-nums text-yellow-400">0.0</div>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="showFinalReport()" class="bg-indigo-500 text-white font-black px-4 py-3 rounded-xl shadow-lg hover:bg-indigo-400 transition-all uppercase text-[10px] tracking-widest">Final Analiz</button>
+                    <button onclick="showFinalReport()" class="bg-indigo-500 text-white font-black px-4 py-3 rounded-xl shadow-lg hover:bg-indigo-400 transition-all uppercase text-[10px] tracking-widest text-white">Final Analiz</button>
                     <button onclick="exportAllToSheets()" class="bg-emerald-500 hover:bg-emerald-400 text-indigo-950 font-black px-4 py-3 rounded-xl shadow-lg transition-all flex items-center gap-2 text-[10px] tracking-widest uppercase">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         E-TABLOYA AKTAR
@@ -149,89 +149,89 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 text-white">
             <!-- Sol Panel: Katılımcılar -->
             <div id="participantPanel" class="lg:col-span-4 space-y-4 md:space-y-6">
-                <div class="glass p-6 md:p-8 rounded-[2rem] space-y-6 relative overflow-hidden h-full flex flex-col">
-                    <h3 class="text-lg font-bold flex items-center justify-between italic">
-                        <span class="flex items-center gap-3"><span class="w-1.5 h-5 bg-yellow-400 rounded-full"></span>Sınıf Listesi</span>
-                        <span id="participantCount" class="text-xs bg-white/10 px-2 py-1 rounded-lg not-italic">0</span>
+                <div class="glass p-6 md:p-8 rounded-[2rem] space-y-6 relative overflow-hidden h-full flex flex-col text-white">
+                    <h3 class="text-lg font-bold flex items-center justify-between italic text-white">
+                        <span class="flex items-center gap-3 text-white text-white"><span class="w-1.5 h-5 bg-yellow-400 rounded-full text-yellow-400"></span>Sınıf Listesi</span>
+                        <span id="participantCount" class="text-xs bg-white/10 px-2 py-1 rounded-lg not-italic text-white">0</span>
                     </h3>
 
-                    <div id="participantGrid" class="grid grid-cols-2 gap-2 overflow-auto custom-scrollbar pr-1 max-h-[400px]">
-                        <div class="col-span-2 text-center opacity-20 py-10 italic text-sm">Giriş bekleniyor...</div>
+                    <div id="participantGrid" class="grid grid-cols-2 gap-2 overflow-auto custom-scrollbar pr-1 max-h-[400px] text-white">
+                        <div class="col-span-2 text-center opacity-20 py-10 italic text-sm text-white">Giriş bekleniyor...</div>
                     </div>
                     
-                    <div id="teacherActionArea" class="pt-4 border-t border-white/5 space-y-3 hidden-view">
-                        <div id="lessonStartBlock">
-                            <p class="text-[10px] text-slate-400 mb-2 font-bold uppercase text-center">Herkes geldiyse dersi başlatın</p>
+                    <div id="teacherActionArea" class="pt-4 border-t border-white/5 space-y-3 hidden-view text-white">
+                        <div id="lessonStartBlock" class="text-white">
+                            <p class="text-[10px] text-slate-400 mb-2 font-bold uppercase text-center text-white">Herkes geldiyse dersi başlatın</p>
                             <button onclick="startLesson()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black py-4 rounded-xl shadow-xl uppercase text-xs tracking-widest transition-all">
                                 🚀 DERSİ BAŞLAT
                             </button>
                         </div>
                         
                         <div id="nextStudentBlock" class="hidden-view">
-                            <button id="nextStudentBtn" onclick="pickRandomStudent()" class="w-full bg-amber-500 hover:bg-amber-400 text-indigo-950 font-black py-4 rounded-xl shadow-xl uppercase text-xs tracking-widest transition-all">
+                            <button id="nextStudentBtn" onclick="pickRandomStudent()" class="w-full bg-amber-500 hover:bg-amber-400 text-indigo-950 font-black py-4 rounded-xl shadow-xl uppercase text-xs tracking-widest transition-all text-indigo-950">
                                 🎲 SIRADAKİ ÖĞRENCİ
                             </button>
                         </div>
 
                         <div id="finishPresentationBlock" class="hidden-view">
-                            <div class="p-3 bg-yellow-400/10 rounded-xl text-center border border-yellow-400/20 mb-3">
+                            <div class="p-3 bg-yellow-400/10 rounded-xl text-center border border-yellow-400/20 mb-3 text-white text-yellow-400">
                                 <p class="text-[8px] font-bold text-yellow-400 uppercase tracking-widest">Sunumda</p>
-                                <p id="teacherActiveName" class="text-base font-black text-white italic truncate"></p>
+                                <p id="teacherActiveName" class="text-base font-black text-white italic truncate text-white text-white"></p>
                             </div>
-                            <button onclick="finishScoring()" class="w-full bg-rose-600 text-white font-black py-4 rounded-xl uppercase text-xs shadow-lg">
+                            <button onclick="finishScoring()" class="w-full bg-rose-600 text-white font-black py-4 rounded-xl uppercase text-xs shadow-lg text-white">
                                 PUANLAMAYI BİTİR
                             </button>
                         </div>
                     </div>
 
-                    <div id="studentStatusArea" class="pt-4 border-t border-white/5 hidden-view">
-                        <div class="p-4 rounded-xl bg-white/5 border border-white/10 text-center">
-                            <p id="studentWaitMsg" class="text-xs font-bold text-purple-300 italic">Dersın başlaması bekleniyor...</p>
+                    <div id="studentStatusArea" class="pt-4 border-t border-white/5 hidden-view text-white">
+                        <div class="p-4 rounded-xl bg-white/5 border border-white/10 text-center text-white text-white">
+                            <p id="studentWaitMsg" class="text-xs font-bold text-purple-300 italic text-white text-purple-300">Dersın başlaması bekleniyor...</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Sağ Panel: Sunum & Puanlama -->
-            <div id="contentArea" class="lg:col-span-8 h-full">
-                <div id="activePresentationView" class="hidden-view space-y-6">
-                    <div id="teacherLiveView" class="grid grid-cols-1 md:grid-cols-2 gap-6 h-full hidden-view">
-                        <div class="glass rounded-[2rem] flex flex-col min-h-[400px]">
-                            <div class="p-6 border-b border-white/5 flex justify-between items-center bg-white/5">
-                                <h3 class="font-bold text-sm italic text-white uppercase tracking-tighter">Oylama Detayı</h3>
-                                <span id="voteCountHeader" class="text-yellow-400 font-bold text-xs">0 OY</span>
+            <div id="contentArea" class="lg:col-span-8 h-full text-white">
+                <div id="activePresentationView" class="hidden-view space-y-6 text-white text-white">
+                    <div id="teacherLiveView" class="grid grid-cols-1 md:grid-cols-2 gap-6 h-full hidden-view text-white text-white">
+                        <div class="glass rounded-[2rem] flex flex-col min-h-[400px] text-white">
+                            <div class="p-6 border-b border-white/5 flex justify-between items-center bg-white/5 text-white">
+                                <h3 class="font-bold text-sm italic text-white uppercase tracking-tighter text-white">Oylama Detayı</h3>
+                                <span id="voteCountHeader" class="text-yellow-400 font-bold text-xs text-white text-yellow-400">0 OY</span>
                             </div>
-                            <div id="votesGrid" class="p-6 space-y-3 overflow-auto custom-scrollbar">
+                            <div id="votesGrid" class="p-6 space-y-3 overflow-auto custom-scrollbar text-white">
                                 <div id="noActiveScoreMsg" class="text-center opacity-20 py-20 italic text-sm text-white">Sıradaki öğrenci bekleniyor...</div>
                             </div>
                         </div>
-                        <div class="glass rounded-[2rem] flex flex-col min-h-[400px]">
-                            <div class="p-6 border-b border-white/5 bg-indigo-500/10 flex justify-between items-center text-white">
-                                <h3 class="font-bold text-sm uppercase italic">Geçmiş</h3>
+                        <div class="glass rounded-[2rem] flex flex-col min-h-[400px] text-white">
+                            <div class="p-6 border-b border-white/5 bg-indigo-500/10 flex justify-between items-center text-white text-white">
+                                <h3 class="font-bold text-sm uppercase italic text-white">Geçmiş</h3>
                             </div>
-                            <div id="historyList" class="p-4 space-y-3 overflow-auto custom-scrollbar flex-grow"></div>
+                            <div id="historyList" class="p-4 space-y-3 overflow-auto custom-scrollbar flex-grow text-white"></div>
                         </div>
                     </div>
 
-                    <div id="studentVotePanel" class="w-full max-w-2xl mx-auto hidden-view space-y-8 animate-in fade-in">
-                        <div class="text-center space-y-2">
-                            <p class="text-[10px] font-bold text-indigo-400 uppercase tracking-[0.3em]">Sunum Değerlendiriliyor</p>
-                            <h2 id="currentStudentDisplay" class="text-4xl md:text-6xl font-black italic uppercase tracking-tighter text-white drop-shadow-2xl truncate">...</h2>
+                    <div id="studentVotePanel" class="w-full max-w-2xl mx-auto hidden-view space-y-8 animate-in fade-in text-white text-white">
+                        <div class="text-center space-y-2 text-white">
+                            <p class="text-[10px] font-bold text-indigo-400 uppercase tracking-[0.3em] text-white">Sunum Değerlendiriliyor</p>
+                            <h2 id="currentStudentDisplay" class="text-4xl md:text-6xl font-black italic uppercase tracking-tighter text-white drop-shadow-2xl truncate text-white">...</h2>
                         </div>
-                        <div id="voteButtons" class="glass p-6 md:p-10 rounded-[2rem] shadow-2xl">
-                            <div class="grid grid-cols-4 sm:grid-cols-7 gap-2" id="scoreGrid"></div>
-                            <p class="text-center text-[10px] text-slate-500 mt-6 uppercase font-bold tracking-widest opacity-50 italic">Puanınız gizli tutulur</p>
+                        <div id="voteButtons" class="glass p-6 md:p-10 rounded-[2rem] shadow-2xl text-white">
+                            <div class="grid grid-cols-4 sm:grid-cols-7 gap-2 text-white text-white" id="scoreGrid"></div>
+                            <p class="text-center text-[10px] text-slate-500 mt-6 uppercase font-bold tracking-widest opacity-50 italic text-white text-slate-500">Puanınız gizli tutulur</p>
                         </div>
-                        <div id="voteSuccess" class="glass p-10 rounded-[2rem] text-center hidden-view animate-in zoom-in text-emerald-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mx-auto mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                            <h3 class="text-lg font-bold text-white uppercase italic">Puan Gönderildi!</h3>
+                        <div id="voteSuccess" class="glass p-10 rounded-[2rem] text-center hidden-view animate-in zoom-in text-emerald-400 text-white text-emerald-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mx-auto mb-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            <h3 class="text-lg font-bold text-white uppercase italic text-white text-white">Puan Gönderildi!</h3>
                         </div>
                     </div>
                 </div>
 
-                <div id="waitingView" class="h-full flex flex-col items-center justify-center space-y-6 opacity-40 py-20">
-                    <div class="w-20 h-20 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-                    <h2 class="text-2xl font-black italic uppercase">Ders Akışı Bekleniyor</h2>
+                <div id="waitingView" class="h-full flex flex-col items-center justify-center space-y-6 opacity-40 py-20 text-white">
+                    <div class="w-20 h-20 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin text-white"></div>
+                    <h2 class="text-2xl font-black italic uppercase text-white">Ders Akışı Bekleniyor</h2>
                 </div>
             </div>
         </div>
@@ -239,71 +239,71 @@
 
     <!-- 4. FİNAL RAPOR EKRANI -->
     <div id="finalReportView" class="max-w-6xl mx-auto hidden-view animate-in fade-in py-10 text-white">
-        <div class="flex justify-between items-center mb-10">
-            <div><h1 class="text-4xl font-black italic uppercase">Oturum Raporu</h1></div>
+        <div class="flex justify-between items-center mb-10 text-white">
+            <div><h1 class="text-4xl font-black italic uppercase text-white">Oturum Raporu</h1></div>
             <div class="flex gap-4">
                 <button onclick="exportAllToSheets()" class="bg-emerald-500 hover:bg-emerald-400 text-indigo-950 font-black px-6 py-3 rounded-xl shadow-lg transition-all flex items-center gap-2 text-xs tracking-widest uppercase">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     E-TABLOYA AKTAR
                 </button>
-                <button onclick="location.reload()" class="bg-white/10 px-6 py-3 rounded-xl font-bold text-xs uppercase hover:bg-white/20 transition-all">Kapat</button>
+                <button onclick="location.reload()" class="bg-white/10 px-6 py-3 rounded-xl font-bold text-xs uppercase hover:bg-white/20 transition-all text-white">Kapat</button>
             </div>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            <div class="glass p-8 rounded-[2rem] text-center border-b-4 border-blue-400">
-                <p class="text-[10px] font-black uppercase text-slate-400">Aritmetik Ortalama</p>
-                <div id="finalTotalAvg" class="text-6xl font-black italic">0.0</div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 text-white">
+            <div class="glass p-8 rounded-[2rem] text-center border-b-4 border-blue-400 text-white text-white">
+                <p class="text-[10px] font-black uppercase text-slate-400 text-white text-slate-400 text-white">Aritmetik Ortalama</p>
+                <div id="finalTotalAvg" class="text-6xl font-black italic text-white text-white text-white">0.0</div>
             </div>
-            <div class="glass p-8 rounded-[2rem] text-center border-b-4 border-yellow-400">
-                <p class="text-[10px] font-black uppercase text-yellow-400">Max Skor</p>
-                <div id="finalMaxName" class="text-lg font-bold uppercase truncate">---</div>
-                <div id="finalMaxScore" class="text-4xl font-black text-yellow-400">0.0</div>
+            <div class="glass p-8 rounded-[2rem] text-center border-b-4 border-yellow-400 text-white text-white">
+                <p class="text-[10px] font-black uppercase text-yellow-400 text-white text-yellow-400 text-white text-white">Max Skor</p>
+                <div id="finalMaxName" class="text-lg font-bold uppercase truncate text-white text-white text-white">---</div>
+                <div id="finalMaxScore" class="text-4xl font-black text-yellow-400 text-white text-yellow-400 text-white">0.0</div>
             </div>
-            <div class="glass p-8 rounded-[2rem] text-center border-b-4 border-rose-400">
-                <p class="text-[10px] font-black uppercase text-rose-400">Min Skor</p>
-                <div id="finalMinName" class="text-lg font-bold uppercase truncate">---</div>
-                <div id="finalMinScore" class="text-4xl font-black text-rose-400">0.0</div>
+            <div class="glass p-8 rounded-[2rem] text-center border-b-4 border-rose-400 text-white text-white">
+                <p class="text-[10px] font-black uppercase text-rose-400 text-white text-rose-400 text-white text-white">Min Skor</p>
+                <div id="finalMinName" class="text-lg font-bold uppercase truncate text-white text-white text-white text-white">---</div>
+                <div id="finalMinScore" class="text-4xl font-black text-rose-400 text-white text-rose-400 text-white">0.0</div>
             </div>
         </div>
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-            <div class="glass rounded-[2rem] overflow-hidden flex flex-col h-[400px]">
-                <div class="p-6 border-b border-white/5 bg-indigo-500/10"><h3 class="font-black italic uppercase text-xs">Sıralama</h3></div>
-                <div id="finalLeaderboard" class="p-6 space-y-3 overflow-auto custom-scrollbar flex-grow"></div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 text-white">
+            <div class="glass rounded-[2rem] overflow-hidden flex flex-col h-[400px] text-white">
+                <div class="p-6 border-b border-white/5 bg-indigo-500/10 text-white text-white text-white"><h3 class="font-black italic uppercase text-xs text-white text-white text-white">Sıralama</h3></div>
+                <div id="finalLeaderboard" class="p-6 space-y-3 overflow-auto custom-scrollbar flex-grow text-white"></div>
             </div>
-            <div class="glass rounded-[2rem] p-8 flex flex-col items-center justify-center text-center">
-                <div class="chart-circle" id="genderChart">
-                    <div class="w-[120px] h-[120px] bg-[#1e1b4b] rounded-full flex flex-col items-center justify-center">
-                        <span class="text-[10px] font-black opacity-40 uppercase">Toplam</span>
-                        <span class="text-2xl font-black" id="totalVotesText">0</span>
+            <div class="glass rounded-[2rem] p-8 flex flex-col items-center justify-center text-center text-white">
+                <div class="chart-circle text-white text-white" id="genderChart">
+                    <div class="w-[120px] h-[120px] bg-[#1e1b4b] rounded-full flex flex-col items-center justify-center text-white text-white text-white">
+                        <span class="text-[10px] font-black opacity-40 uppercase text-white text-white text-white">Toplam</span>
+                        <span class="text-2xl font-black text-white text-white text-white text-white" id="totalVotesText">0</span>
                     </div>
                 </div>
-                <div class="flex gap-10 mt-8">
-                    <div><p class="text-[9px] font-black text-blue-400 uppercase">Erkek</p><p class="text-xl font-black" id="maleAvgText">0.0</p></div>
-                    <div><p class="text-[9px] font-black text-pink-400 uppercase">Kadın</p><p class="text-xl font-black" id="femaleAvgText">0.0</p></div>
+                <div class="flex gap-10 mt-8 text-white">
+                    <div><p class="text-[9px] font-black text-blue-400 uppercase text-white text-blue-400">Erkek</p><p class="text-xl font-black text-white text-white" id="maleAvgText">0.0</p></div>
+                    <div><p class="text-[9px] font-black text-pink-400 uppercase text-white text-pink-400">Kadın</p><p class="text-xl font-black text-white text-white" id="femaleAvgText">0.0</p></div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- 5. ÖĞRENCİ FİNAL EKRANI -->
-    <div id="studentFinalView" class="max-w-md mx-auto hidden-view animate-in zoom-in py-20 text-white text-center">
-        <div class="glass p-12 rounded-[3rem] space-y-8">
-            <div class="w-24 h-24 bg-yellow-400 text-indigo-950 rounded-full mx-auto flex items-center justify-center shadow-2xl">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    <div id="studentFinalView" class="max-w-md mx-auto hidden-view animate-in zoom-in py-20 text-white text-center text-white">
+        <div class="glass p-12 rounded-[3rem] space-y-8 text-white">
+            <div class="w-24 h-24 bg-yellow-400 text-indigo-950 rounded-full mx-auto flex items-center justify-center shadow-2xl text-indigo-950">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-indigo-950" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
             </div>
             <div class="space-y-2">
-                <h1 class="text-3xl font-black italic uppercase">Ders Sona Erdi</h1>
-                <p class="text-slate-400 text-sm">Sunumlar tamamlandı ve değerlendirildi. Katıldığınız için teşekkürler!</p>
+                <h1 class="text-3xl font-black italic uppercase text-white">Ders Sona Erdi</h1>
+                <p class="text-slate-400 text-sm text-slate-400">Sunumlar tamamlandı ve değerlendirildi. Katıldığınız için teşekkürler!</p>
             </div>
-            <button onclick="location.reload()" class="w-full bg-white/10 hover:bg-white/20 border border-white/20 py-4 rounded-2xl font-bold uppercase tracking-widest text-xs transition-all">
+            <button onclick="location.reload()" class="w-full bg-white/10 hover:bg-white/20 border border-white/20 py-4 rounded-2xl font-bold uppercase tracking-widest text-xs transition-all text-white">
                 OTURUMU KAPAT
             </button>
         </div>
     </div>
 
     <!-- Bildirim -->
-    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 glass px-8 py-4 rounded-full border-yellow-400/50 translate-y-32 opacity-0 transition-all duration-700 z-[100] font-bold text-yellow-400 text-xs shadow-2xl">
-        <span id="toastMsg">...</span>
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 glass px-8 py-4 rounded-full border-yellow-400/50 translate-y-32 opacity-0 transition-all duration-700 z-[100] font-bold text-yellow-400 text-xs shadow-2xl text-white">
+        <span id="toastMsg" class="text-white text-yellow-400">...</span>
     </div>
 
     <script>
@@ -500,7 +500,6 @@
         function handleLobbyStateChange() {
             const hasActive = activeStudent !== '';
             
-            // Seçim yapılır yapılmaz history listesini "Canlı" kartıyla beraber güncelle
             renderHistory(lastHistory);
 
             if (currentRole === 'student') {
@@ -568,7 +567,6 @@
             const container = document.getElementById('historyList');
             let html = "";
             
-            // "Puan varsa göster" koşulunu kaldırdık; sunan kişi belli olduğu an "Canlı" kartı görünür.
             if (activeStudent) {
                 html += `<div class="glass p-4 rounded-xl flex items-center justify-between border-yellow-400/30 live-card text-white">
                             <div class="flex flex-col">
@@ -613,8 +611,25 @@
         async function exportAllToSheets() {
             if (lastHistory.length === 0) return showToast("Veri yok.");
             showToast("Sheets'e iletiliyor...");
-            const payload = lastHistory.map(h => ({ name: h.studentName, score: h.score, time: new Date(h.timestamp).toLocaleString('tr-TR') }));
-            try { await fetch(AUTO_SHEETS_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(payload) }); showToast("Aktarıldı!"); } catch (e) { showToast("Hata!"); }
+
+            // VERİLERİ PUANDAN YÜKSEKTEN DÜŞÜĞE SIRALAMA
+            const sortedData = [...lastHistory].sort((a, b) => parseFloat(b.score) - parseFloat(a.score));
+
+            const payload = sortedData.map(h => ({ 
+                name: h.studentName, 
+                score: h.score, 
+                time: new Date(h.timestamp).toLocaleString('tr-TR') 
+            }));
+
+            try { 
+                await fetch(AUTO_SHEETS_URL, { 
+                    method: 'POST', 
+                    mode: 'no-cors', 
+                    headers: { 'Content-Type': 'text/plain' }, 
+                    body: JSON.stringify(payload) 
+                }); 
+                showToast("Sıralı liste aktarıldı!"); 
+            } catch (e) { showToast("Hata!"); }
         }
 
         function showToast(msg) {
