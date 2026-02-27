@@ -51,8 +51,6 @@
             font-size: 2rem;
         }
 
-        .timer-ring { transform: rotate(-90deg); transition: stroke-dashoffset 1s linear; }
-
         .bar-chart-container { display: flex; align-items: flex-end; gap: 4px; height: 100px; padding: 10px; }
         .bar-item { flex: 1; background: #fbbf24; min-width: 8px; border-radius: 4px 4px 0 0; transition: height 0.3s ease; }
 
@@ -62,8 +60,7 @@
             display: flex; align-items: center; justify-content: center;
         }
 
-        .student-item { transition: 0.3s; }
-        .student-item.used { opacity: 0.4; filter: grayscale(1); pointer-events: none; }
+        .used { opacity: 0.4; filter: grayscale(1); pointer-events: none; }
         
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: #fbbf24; border-radius: 10px; }
@@ -264,17 +261,17 @@
                 <div id="finalStdDev" class="text-4xl font-black italic">0.0</div>
             </div>
             <div class="glass p-6 rounded-2xl text-center border-b-4 border-yellow-400">
-                <p class="text-[9px] font-black uppercase text-slate-400 mb-1">En Çok Verilen (Mod)</p>
+                <p class="text-[9px] font-black uppercase text-slate-400 mb-1">Mod</p>
                 <div id="finalMode" class="text-4xl font-black italic">0.0</div>
             </div>
             <div class="glass p-6 rounded-2xl text-center border-b-4 border-emerald-400">
-                <p class="text-[9px] font-black uppercase text-slate-400 mb-1">Oylanan Sunum</p>
+                <p class="text-[9px] font-black uppercase text-slate-400 mb-1">Sunum</p>
                 <div id="finalCount" class="text-4xl font-black italic">0</div>
             </div>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div class="glass rounded-[2rem] overflow-hidden flex flex-col min-h-[400px]">
-                <div class="p-6 border-b border-white/5 bg-indigo-500/10"><h3 class="font-black italic uppercase text-xs">Puan Dağılım Grafiği</h3></div>
+                <div class="p-6 border-b border-white/5 bg-indigo-500/10"><h3 class="font-black italic uppercase text-xs">Puan Grafiği</h3></div>
                 <div class="p-10 flex flex-col justify-end flex-grow">
                     <div id="scoreFlucChart" class="bar-chart-container"></div>
                 </div>
@@ -293,43 +290,49 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, query, onSnapshot, addDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, addDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = JSON.parse(__firebase_config);
+        // Vercel/GitHub ortamı için doğrudan yapılandırma
+        const firebaseConfig = {
+            apiKey: "AIzaSyDF1juJ_HX3GQ3tYop9cUsSPuZ70-cID1s",
+            authDomain: "gradelobby-64c60.firebaseapp.com",
+            projectId: "gradelobby-64c60",
+            storageBucket: "gradelobby-64c60.firebasestorage.app",
+            messagingSenderId: "629052596863",
+            appId: "1:629052596863:web:61b499c3b829af205c154a",
+            measurementId: "G-T4N14WHMT3"
+        };
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'gradelobby-v6-workflow';
+        const appId = 'gradelobby-v6-workflow';
 
         let currentUser = null, currentRole = null, currentLobbyCode = null, activeStudent = '';
         let lobbySub = null, votesSub = null, historySub = null, participantsSub = null, emojiSub = null;
         let currentAvg = "0.0", lastHistory = [], sessionAllVotes = [], participants = [];
         let selectedGender = 'male', selectedScore = null, timerInterval = null;
 
-        // Firebase Auth Setup
-        const initAuth = async () => {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-                await signInAnonymously(auth);
-            }
-        };
-
+        // Firebase Auth
         onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = user;
-                console.log("Auth verified:", user.uid);
-            }
+            if (user) currentUser = user;
         });
 
-        // Global exposing for onclick handlers
+        const ensureAuth = async () => {
+            if (!auth.currentUser) await signInAnonymously(auth);
+            return auth.currentUser;
+        };
+
+        // Global functions
         window.selectRole = async (role) => {
-            await initAuth();
-            currentRole = role;
-            document.getElementById('roleView').classList.add('hidden-view');
-            if (role === 'teacher') createLobby();
-            else document.getElementById('studentJoinView').classList.remove('hidden-view');
+            try {
+                await ensureAuth();
+                currentRole = role;
+                document.getElementById('roleView').classList.add('hidden-view');
+                if (role === 'teacher') createLobby();
+                else document.getElementById('studentJoinView').classList.remove('hidden-view');
+            } catch (e) { showToast("Bağlantı hatası!"); }
         };
 
         window.setGender = (gender) => {
@@ -339,11 +342,11 @@
         };
 
         async function createLobby() {
-            if (!currentUser) return;
+            const user = await ensureAuth();
             const code = Math.random().toString(36).substring(2, 8).toUpperCase();
             currentLobbyCode = code;
             await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'lobbies', code), { 
-                code, teacherId: currentUser.uid, currentStudent: '', 
+                code, teacherId: user.uid, currentStudent: '', 
                 isLocked: false, isFinished: false, timerEnd: 0, createdAt: Date.now() 
             });
             setupUI('teacher');
@@ -351,13 +354,12 @@
         }
 
         window.joinLobby = async () => {
-            if (!currentUser) return;
+            const user = await ensureAuth();
             const code = document.getElementById('lobbyCodeInput').value.trim().toUpperCase();
             const name = document.getElementById('studentNameInput').value.trim();
             if (code.length < 4 || name.length < 2) return showToast("Eksik bilgi!");
             
-            const lobbyRef = doc(db, 'artifacts', appId, 'public', 'data', 'lobbies', code);
-            const lobbyDoc = await getDoc(lobbyRef);
+            const lobbyDoc = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'lobbies', code));
             if (!lobbyDoc.exists()) return showToast("Oda bulunamadı!");
             if (lobbyDoc.data().isLocked) return showToast("Ders başladı!");
             
@@ -365,8 +367,8 @@
             currentUser.customName = name;
             currentUser.customGender = selectedGender;
             
-            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'participants', currentUser.uid), {
-                uid: currentUser.uid, lobbyId: code, name: name, gender: selectedGender, joinedAt: Date.now()
+            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'participants', user.uid), {
+                uid: user.uid, lobbyId: code, name: name, gender: selectedGender, joinedAt: Date.now()
             });
             setupUI('student');
             startLobbyListeners(code);
@@ -389,8 +391,6 @@
         }
 
         function startLobbyListeners(code) {
-            if (!currentUser) return;
-            
             lobbySub = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'lobbies', code), (snapshot) => {
                 const data = snapshot.data(); if (!data) return;
                 if (data.timerEnd > Date.now()) startLocalTimer(data.timerEnd);
@@ -398,30 +398,28 @@
 
                 if (data.isFinished && currentRole === 'student') {
                     document.getElementById('mainDashboard').classList.add('hidden-view');
-                    document.getElementById('studentFinalView')?.classList.remove('hidden-view');
+                    showToast("Ders bitti!");
                 }
-
                 if (currentRole === 'teacher') {
                     document.getElementById('lessonStartBlock').classList.toggle('hidden-view', data.isLocked);
                     document.getElementById('nextStudentBlock').classList.toggle('hidden-view', !data.isLocked || data.currentStudent !== '');
                 }
-
                 if (data.currentStudent !== activeStudent) { 
                     activeStudent = data.currentStudent; 
                     handleLobbyStateChange(); 
                 }
-            }, (err) => console.error("Lobby sub error:", err));
+            });
 
             participantsSub = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'participants'), (snap) => {
                 participants = snap.docs.map(d => d.data()).filter(p => p.lobbyId === code);
                 renderParticipantGrid();
-            }, (err) => console.error("Participant sub error:", err));
+            });
 
             emojiSub = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'emojis'), (snap) => {
                 snap.docChanges().forEach(change => {
                     if (change.type === "added") {
                         const data = change.doc.data();
-                        if (data.lobbyId === code && data.timestamp > Date.now() - 5000) showFloatingEmoji(data.emoji);
+                        if (data.lobbyId === code && data.timestamp > Date.now() - 3000) showFloatingEmoji(data.emoji);
                     }
                 });
             });
@@ -448,10 +446,7 @@
                 document.getElementById('timerText').innerText = remain;
                 const offset = 100.5 - (remain / total) * 100.5;
                 if (circle) circle.style.strokeDashoffset = offset;
-                if (remain <= 0) {
-                    clearInterval(timerInterval);
-                    showToast("Süre doldu!");
-                }
+                if (remain <= 0) clearInterval(timerInterval);
             }, 1000);
         }
 
@@ -463,7 +458,6 @@
         }
 
         window.sendEmoji = async (emoji) => {
-            if (!currentUser) return;
             await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'emojis'), { lobbyId: currentLobbyCode, emoji, timestamp: Date.now() });
         };
 
@@ -496,12 +490,10 @@
         }
 
         window.startLesson = async () => {
-            if (!currentUser) return;
             await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'lobbies', currentLobbyCode), { isLocked: true });
         };
 
         window.pickRandomStudent = async () => {
-            if (!currentUser) return;
             const usedNames = lastHistory.map(h => h.studentName);
             const available = participants.filter(p => !usedNames.includes(p.name));
             if (available.length === 0) return showToast("Herkes sunum yaptı!");
@@ -522,7 +514,7 @@
                 if (hasActive && activeStudent === currentUser.customName) {
                     document.getElementById('studentVotePanel').classList.add('hidden-view');
                     document.getElementById('studentStatusArea').classList.remove('hidden-view');
-                    document.getElementById('studentWaitMsg').innerText = "Sunum sırası sizde!";
+                    document.getElementById('studentWaitMsg').innerText = "Sıra sizde!";
                 } else {
                     document.getElementById('studentVotePanel').classList.toggle('hidden-view', !hasActive);
                     document.getElementById('studentStatusArea').classList.toggle('hidden-view', hasActive);
@@ -533,14 +525,13 @@
                     renderScoreButtons();
                 }
             } else {
-                document.getElementById('waitingView').classList.toggle('hidden-view', true); // Managed by locked state elsewhere
                 document.getElementById('finishPresentationBlock').classList.toggle('hidden-view', !hasActive);
                 document.getElementById('teacherActiveName').innerText = activeStudent;
             }
         }
 
         window.submitFullVote = async () => {
-            if (!currentUser || selectedScore === null) return showToast("Puan seçin!");
+            if (selectedScore === null) return showToast("Puan seçin!");
             const note = document.getElementById('feedbackNote').value.trim();
             await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'votes'), { 
                 lobbyId: currentLobbyCode, voterName: currentUser.customName, 
@@ -570,7 +561,7 @@
             if (!grid) return;
             document.getElementById('voteCountHeader').innerText = votes.length + " OY";
             if (votes.length === 0) {
-                grid.innerHTML = `<div class="text-center opacity-20 py-20 italic text-sm">Katılımcıların notları bekleniyor...</div>`;
+                grid.innerHTML = `<div class="text-center opacity-20 py-20 italic text-sm">Notlar bekleniyor...</div>`;
                 currentAvg = "0.0";
             } else {
                 grid.innerHTML = votes.map(v => `
@@ -602,7 +593,7 @@
         }
 
         window.finishScoring = async () => {
-            if (!currentUser || currentAvg === "0.0") return showToast("Puanlama yok!");
+            if (currentAvg === "0.0") return showToast("Puanlama yok!");
             await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'history'), { 
                 lobbyId: currentLobbyCode, studentName: activeStudent, 
                 score: currentAvg, timestamp: Date.now() 
@@ -612,7 +603,7 @@
         }
 
         window.showFinalReport = async () => {
-            if (!currentUser || lastHistory.length === 0) return showToast("Veri yok!");
+            if (lastHistory.length === 0) return showToast("Veri yok!");
             await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'lobbies', currentLobbyCode), { isFinished: true });
             document.getElementById('mainDashboard').classList.add('hidden-view');
             document.getElementById('finalReportView').classList.remove('hidden-view');
@@ -637,13 +628,11 @@
             `).join('');
 
             const chart = document.getElementById('scoreFlucChart');
-            if (chart) {
-                const historyRev = [...lastHistory].reverse();
-                chart.innerHTML = historyRev.map(h => {
-                    const height = (parseFloat(h.score) / 20) * 100;
-                    return `<div class="bar-item" style="height: ${height}%" title="${h.studentName}: ${h.score}"></div>`;
-                }).join('');
-            }
+            const historyRev = [...lastHistory].reverse();
+            chart.innerHTML = historyRev.map(h => {
+                const height = (parseFloat(h.score) / 20) * 100;
+                return `<div class="bar-item" style="height: ${height}%" title="${h.studentName}: ${h.score}"></div>`;
+            }).join('');
         };
 
         function showToast(msg) {
