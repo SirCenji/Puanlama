@@ -69,6 +69,56 @@
         
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: #fbbf24; border-radius: 10px; }
+
+        /* Canlı Emoji Reaksiyonları CSS */
+        .reaction-btn {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        @media (min-width: 768px) {
+            .reaction-btn {
+                width: 48px;
+                height: 48px;
+                font-size: 22px;
+            }
+        }
+        .reaction-btn:active { transform: scale(0.8); }
+        .reaction-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.1); }
+
+        .floating-emoji {
+            position: fixed;
+            bottom: 20px;
+            font-size: 28px;
+            animation: floatUp 3s ease-out forwards;
+            opacity: 0;
+            z-index: 9999;
+            pointer-events: none;
+            user-select: none;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+        }
+        
+        @media (min-width: 768px) {
+            .floating-emoji { font-size: 36px; bottom: 0; }
+        }
+
+        @keyframes floatUp {
+            0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
+            10% { transform: translate(0, -30px) scale(1.2); opacity: 1; }
+            100% { transform: translate(var(--x-drift), -80vh) scale(1); opacity: 0; }
+        }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -129,7 +179,7 @@
     <div id="mainDashboard" class="max-w-[1400px] mx-auto hidden-view space-y-6 md:space-y-8 animate-in fade-in duration-1000">
         <header class="glass p-4 md:p-6 rounded-[1.5rem] md:rounded-[2rem] flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-4 md:gap-5 w-full md:w-auto">
-                <div id="displayCode" class="w-12 h-12 md:w-16 md:h-16 bg-yellow-400 text-indigo-900 rounded-xl md:rounded-2xl flex items-center justify-center font-black text-lg md:text-2xl shadow-lg">...</div>
+                <div id="displayCode" class="w-12 h-12 md:w-24 md:h-16 bg-yellow-400 text-indigo-900 rounded-xl md:rounded-2xl flex items-center justify-center font-black text-lg md:text-2xl shadow-lg">...</div>
                 <div>
                     <h3 class="font-bold text-base md:text-xl tracking-tight" id="statusHeader">Oturum Açık</h3>
                     <p id="roleBadge" class="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-yellow-400/80">YÜKLENİYOR</p>
@@ -138,7 +188,7 @@
 
             <div id="globalTimer" class="hidden-view flex flex-col items-center">
                 <span class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Kalan Süre</span>
-                <div id="timerDisplay" class="timer-badge text-xl font-black tabular-nums">00:00</div>
+                <div id="timerDisplay" class="timer-badge text-lg md:text-xl font-black tabular-nums">00:00</div>
             </div>
 
             <div id="teacherStats" class="flex items-center justify-between md:justify-end gap-6 md:gap-10 hidden-view w-full md:w-auto border-t md:border-none border-white/5 pt-4 md:pt-0">
@@ -163,7 +213,7 @@
                         <span id="participantCount" class="text-xs bg-white/10 px-2 py-1 rounded-lg not-italic">0</span>
                     </h3>
 
-                    <div id="participantGrid" class="grid grid-cols-2 gap-2 overflow-auto custom-scrollbar pr-1 max-h-[400px]">
+                    <div id="participantGrid" class="grid grid-cols-2 gap-2 overflow-auto custom-scrollbar pr-1 max-h-[300px] md:max-h-[400px]">
                         <div class="col-span-2 text-center opacity-20 py-10 italic text-sm">Giriş bekleniyor...</div>
                     </div>
                     
@@ -206,7 +256,7 @@
             <div id="contentArea" class="lg:col-span-8 h-full">
                 <div id="activePresentationView" class="hidden-view space-y-6">
                     <div id="teacherLiveView" class="grid grid-cols-1 md:grid-cols-2 gap-6 h-full hidden-view">
-                        <div class="glass rounded-[2rem] flex flex-col min-h-[400px]">
+                        <div class="glass rounded-[2rem] flex flex-col min-h-[300px] md:min-h-[400px]">
                             <div class="p-6 border-b border-white/5 flex justify-between items-center bg-white/5">
                                 <h3 class="font-bold text-sm italic uppercase tracking-tighter text-yellow-400">Canlı Oylama</h3>
                                 <span id="voteCountHeader" class="bg-yellow-400 text-indigo-950 px-2 py-1 rounded-md font-bold text-xs">0 OY</span>
@@ -215,7 +265,7 @@
                                 <div id="noActiveScoreMsg" class="text-center opacity-30 py-20 italic text-sm animate-in fade-in">Sıradaki öğrenci bekleniyor...</div>
                             </div>
                         </div>
-                        <div class="glass rounded-[2rem] flex flex-col min-h-[400px]">
+                        <div class="glass rounded-[2rem] flex flex-col min-h-[300px] md:min-h-[400px]">
                             <div class="p-6 border-b border-white/5 bg-indigo-500/10 flex justify-between items-center">
                                 <h3 class="font-bold text-sm uppercase italic text-indigo-300">Geçmiş Analizi</h3>
                             </div>
@@ -285,7 +335,7 @@
             </div>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-            <div class="glass rounded-[2rem] overflow-hidden flex flex-col h-[400px]">
+            <div class="glass rounded-[2rem] overflow-hidden flex flex-col h-[300px] md:h-[400px]">
                 <div class="p-6 border-b border-white/5 bg-indigo-500/10"><h3 class="font-black italic uppercase text-xs">Sıralama</h3></div>
                 <div id="finalLeaderboard" class="p-6 space-y-3 overflow-auto custom-scrollbar flex-grow"></div>
             </div>
@@ -321,7 +371,7 @@
             </div>
         </div>
 
-        <div class="glass rounded-[2rem] flex flex-col min-h-[400px]">
+        <div class="glass rounded-[2rem] flex flex-col min-h-[300px] md:min-h-[400px]">
             <div class="p-6 border-b border-white/5 flex justify-between items-center bg-white/5">
                 <h3 class="font-bold text-sm italic uppercase tracking-tighter text-yellow-400">Arkadaşlarınızın Notları</h3>
             </div>
@@ -338,6 +388,19 @@
     <!-- Bildirim -->
     <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 glass px-8 py-4 rounded-full border-yellow-400/50 translate-y-32 opacity-0 transition-all duration-700 z-[100] font-bold text-yellow-400 text-xs shadow-2xl">
         <span id="toastMsg" class="text-white">...</span>
+    </div>
+
+    <!-- Emoji Konteyneri (Animasyonların Çıkacağı Yer) -->
+    <div id="emojiContainer" class="fixed inset-0 pointer-events-none z-[90] overflow-hidden"></div>
+
+    <!-- Öğrenci Emoji Reaksiyon Paneli -->
+    <div id="reactionPanel" class="fixed bottom-24 right-4 md:bottom-10 md:right-8 flex flex-col gap-2 md:gap-3 hidden-view z-[100] animate-in slide-in-from-right-10">
+        <button onclick="sendReaction('👍')" class="reaction-btn">👍</button>
+        <button onclick="sendReaction('👏')" class="reaction-btn">👏</button>
+        <button onclick="sendReaction('❤️')" class="reaction-btn">❤️</button>
+        <button onclick="sendReaction('🚀')" class="reaction-btn">🚀</button>
+        <button onclick="sendReaction('😂')" class="reaction-btn">😂</button>
+        <button onclick="sendReaction('😲')" class="reaction-btn">😲</button>
     </div>
 
     <script>
@@ -360,6 +423,7 @@
 
         let currentUser = null, currentRole = null, currentLobbyCode = null, activeStudent = '';
         let lobbySub = null, votesSub = null, historySub = null, participantsSub = null;
+        let reactionsSub = null, reactionsInit = false; // Emojiler için
         let currentAvg = "0.0", lastHistory = [], sessionAllVotes = [], participants = [];
         let selectedGender = 'male', isLobbyLocked = false, isLobbyFinished = false;
 
@@ -372,6 +436,7 @@
         const getParticipantsCol = () => db.collection(`artifacts/${appId}/public/data/participants`);
         const getVotesCol = () => db.collection(`artifacts/${appId}/public/data/votes`);
         const getHistoryCol = () => db.collection(`artifacts/${appId}/public/data/history`);
+        const getReactionsCol = () => db.collection(`artifacts/${appId}/public/data/reactions`);
 
         async function initAuth() {
             try {
@@ -505,11 +570,28 @@
                     renderHistory(lastHistory);
                 });
             }
+
+            // Canlı Emojileri Dinle
+            reactionsSub = getReactionsCol().onSnapshot(snap => {
+                if (!reactionsInit) {
+                    reactionsInit = true; // İlk yüklemedeki geçmiş emojileri yoksay
+                    return;
+                }
+                snap.docChanges().forEach(change => {
+                    if (change.type === 'added') {
+                        const data = change.doc.data();
+                        if (data.lobbyId === code) {
+                            showFloatingEmoji(data.emoji);
+                        }
+                    }
+                });
+            });
         }
 
         async function loadStudentFinalStats() {
             document.getElementById('mainDashboard').classList.add('hidden-view');
             document.getElementById('studentFinalView').classList.remove('hidden-view');
+            document.getElementById('reactionPanel').classList.add('hidden-view'); // Final ekranında emojileri gizle
             
             const myVotes = sessionAllVotes.filter(v => v.studentName === currentUser.customName);
             const total = myVotes.length;
@@ -634,11 +716,18 @@
                     document.getElementById('studentVotePanel').classList.add('hidden-view');
                     document.getElementById('studentStatusArea').classList.remove('hidden-view');
                     document.getElementById('studentWaitMsg').innerText = "Şu an sunumdasınız, oylama yapamazsınız.";
+                    document.getElementById('reactionPanel').classList.add('hidden-view'); // Sunum yapan reaksiyon gönderemesin
                 } else {
                     document.getElementById('studentVotePanel').classList.toggle('hidden-view', !hasActive);
                     document.getElementById('studentStatusArea').classList.toggle('hidden-view', hasActive);
                     document.getElementById('voteButtons').classList.remove('hidden-view');
                     document.getElementById('voteSuccess').classList.add('hidden-view');
+                    
+                    if (hasActive) {
+                        document.getElementById('reactionPanel').classList.remove('hidden-view'); // Dinleyiciler için reaksiyon panelini aç
+                    } else {
+                        document.getElementById('reactionPanel').classList.add('hidden-view');
+                    }
                     
                     document.getElementById('voteNoteInput').value = "";
                     selectedScore = null;
@@ -800,6 +889,46 @@
                 }); 
                 showToast("Sıralı liste aktarıldı!"); 
             } catch (e) { showToast("Hata!"); }
+        }
+
+        async function sendReaction(emoji) {
+            if (!activeStudent || !currentLobbyCode) return;
+            try {
+                await getReactionsCol().add({
+                    lobbyId: currentLobbyCode,
+                    emoji: emoji,
+                    timestamp: Date.now()
+                });
+            } catch(e) { console.error("Emoji gönderilemedi", e); }
+        }
+
+        function showFloatingEmoji(emoji) {
+            const container = document.getElementById('emojiContainer');
+            if (!container) return;
+
+            const el = document.createElement('div');
+            el.innerText = emoji;
+            el.className = 'floating-emoji';
+            
+            // Rastgele sağdan uzaklık ve x ekseninde savrulma efekti (-40px ile +40px arası)
+            const isMobile = window.innerWidth < 768;
+            const baseRight = isMobile ? 10 : 40; 
+            const randomRight = baseRight + Math.random() * 40;
+            const randomDrift = (Math.random() - 0.5) * 100; 
+            
+            el.style.right = `${randomRight}px`;
+            el.style.setProperty('--x-drift', `${randomDrift}px`);
+            
+            if (isMobile) {
+                el.style.bottom = '20px';
+            }
+            
+            container.appendChild(el);
+            
+            // Animasyon bittikten sonra DOM'u yormamak için elementi kaldır
+            setTimeout(() => {
+                if (el.parentNode === container) container.removeChild(el);
+            }, 3000);
         }
 
         function showToast(msg) {
